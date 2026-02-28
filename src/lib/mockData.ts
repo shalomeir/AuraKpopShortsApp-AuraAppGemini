@@ -8,6 +8,35 @@ import { Post, CharacterRanking } from '@/types/post';
 
 const DUMMY_JSON_URL = 'https://dummyjson.com';
 
+// 0. Pexels 영상 쇼츠 URL 헬퍼 (API 키가 있으면 패치, 없으면 Fallback 제공)
+async function getMockVideoUrl(index: number): Promise<string> {
+  const pexelsKey = process.env.NEXT_PUBLIC_PEXELS_API_KEY || process.env.PEXELS_API_KEY;
+  if (pexelsKey) {
+    try {
+      const res = await fetch(
+        `https://api.pexels.com/videos/search?query=kpop+dance&per_page=15&orientation=portrait`,
+        { headers: { Authorization: pexelsKey } }
+      );
+      const data = await res.json();
+      if (data.videos && data.videos.length > 0) {
+        const video = data.videos[index % data.videos.length];
+        const videoFile = video.video_files.find((f: Record<string, unknown>) => f.quality === 'hd') || video.video_files[0];
+        return videoFile.link;
+      }
+    } catch (e) {
+      console.error('Pexels API error:', e);
+    }
+  }
+  
+  // Fallback (Pexels에서 무작위 추출된 세로형 댄스/패션 무료 영상 링크)
+  const fallbacks = [
+    'https://videos.pexels.com/video-files/5423853/5423853-uhd_2160_4096_30fps.mp4',
+    'https://videos.pexels.com/video-files/4255556/4255556-uhd_2160_4096_24fps.mp4',
+    'https://videos.pexels.com/video-files/4032731/4032731-uhd_2160_4096_24fps.mp4'
+  ];
+  return fallbacks[index % fallbacks.length];
+}
+
 // 1. 캐릭터 목록 Mock (DummyJSON Users 활용)
 export async function getMockCharacters(limit = 10, skip = 0): Promise<Character[]> {
   try {
@@ -54,8 +83,8 @@ export async function getMockCharacters(limit = 10, skip = 0): Promise<Character
         fan_level: age * 2,
         follower_count: Math.floor(Math.random() * 50000),
         is_active: true,
-        // 기존 썸네일을 아바타용으로 채택
-        avatar_url: String(user.image || ''),
+        // Unsplash API를 사용하여 KPOP 아이돌 초상화 스타일 랜덤 이미지 적용
+        avatar_url: `https://source.unsplash.com/200x200/?korean,portrait,${idStr}`,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
@@ -72,8 +101,8 @@ export async function getMockPosts(limit = 10, skip = 0): Promise<Post[]> {
     const res = await fetch(`${DUMMY_JSON_URL}/posts?limit=${limit}&skip=${skip}`);
     const data = await res.json();
     
-    // 포스트 이미지용: DummyJSON의 Recipe 썸네일을 차용하거나, 픽섬 랜덤 이미지 활용
-    return data.posts.map((post: Record<string, unknown>, index: number) => {
+    // 포스트 이미지용: DummyJSON의 Recipe 썸네일 대신 Unsplash 및 Pexels 비디오 적용
+    const posts = await Promise.all(data.posts.map(async (post: Record<string, unknown>, index: number) => {
       const modeOptions = ['performance', 'daily', 'meme', 'fan'];
       const idNum = Number(post.id) || 0;
       const idStr = String(post.id);
@@ -81,24 +110,33 @@ export async function getMockPosts(limit = 10, skip = 0): Promise<Post[]> {
       const reactions = (post.reactions as Record<string, number>) || { likes: 0 };
       const tags = (post.tags as string[]) || [];
 
+      const isVideo = idNum % 3 === 0;
+      let mediaUrl = `https://source.unsplash.com/400x600/?kpop,idol,${idStr}`;
+      
+      if (isVideo) {
+         mediaUrl = await getMockVideoUrl(index);
+      }
+
       return {
         id: `post_${idStr}`,
         character_id: `char_${post.userId}`, // DummyJSON의 userId를 Character ID에 매핑
-        content_type: (idNum % 3 === 0) ? 'moving_poster' : 'image', // 1/3 확률로 무빙포스터
+        content_type: isVideo ? 'moving_poster' : 'image', // 1/3 확률로 무빙포스터
         caption: String(post.body || '').slice(0, 100) + '... #' + (tags[0] || 'KPOP'), 
-        // 9:16 비율 (세로 숏폼 포맷 모방)을 위해 picsum 랜덤 이미지 사용
-        media_url: `https://picsum.photos/seed/${idStr}/360/640`,
-        media_thumb_url: `https://picsum.photos/seed/${idStr}/180/320`,
+        // 9:16 비율 (세로 숏폼 포맷 모방)을 위해 Unsplash (또는 Pexels) 사용
+        media_url: mediaUrl,
+        media_thumb_url: `https://source.unsplash.com/200x300/?kpop,idol,${idStr}`,
         activity_mode,
         batch_sequence: (index % 4) + 1,
-        generation_meta: { source: 'dummyjson_mock' },
+        generation_meta: { source: isVideo ? 'pexels_mock' : 'unsplash_mock' },
         like_count: reactions.likes || 0,
         view_count: (reactions.likes || 0) * Math.floor(Math.random() * 5 + 2),
         share_count: Math.floor((reactions.likes || 0) / 10),
         status: 'published',
         created_at: new Date(Date.now() - (idNum * 3600000)).toISOString() // 최근 n시간 이내로 임의 분산
       };
-    });
+    }));
+    
+    return posts;
   } catch (error) {
     console.error('Failed to fetch mock posts:', error);
     return [];
