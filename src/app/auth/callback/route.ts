@@ -21,11 +21,24 @@ export async function GET(request: NextRequest) {
       token_hash: tokenHash,
       type: type as EmailOtpType,
     });
+
     return NextResponse.redirect(new URL(next, request.url));
   }
 
   if (code) {
     await supabase.auth.exchangeCodeForSession(code);
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (user) {
+      // Best effort: keep last_seen_at for posting policy.
+      await supabase
+        .from("profiles")
+        .update({ last_seen_at: new Date().toISOString() })
+        .eq("id", user.id);
+    }
+
     return NextResponse.redirect(new URL(next, request.url));
   }
 

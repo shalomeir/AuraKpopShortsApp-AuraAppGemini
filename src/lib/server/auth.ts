@@ -69,5 +69,11 @@ export async function getAuthenticatedUser(): Promise<
     );
   }
 
+  // Best effort: used for activity-based posting policy.
+  await supabase
+    .from("profiles")
+    .update({ last_seen_at: new Date().toISOString() })
+    .eq("id", user.id);
+
   return { userId: user.id, supabase };
 }

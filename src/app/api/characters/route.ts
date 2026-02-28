@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { errorResponse } from "@/lib/api-response";
 import { getAuthenticatedUser } from "@/lib/server/auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { buildFirstDayQueueRows } from "@/lib/scheduling/posting-policy";
 
 interface CharacterCreatePayload {
   name: string;
@@ -21,7 +22,7 @@ interface CharacterCreatePayload {
 }
 
 /**
- * Creates a character and registers initial batch queue (4 items).
+ * Creates a character and registers initial batch queue (first day 3 items).
  */
 export async function POST(request: NextRequest) {
   const auth = await getAuthenticatedUser();
@@ -72,19 +73,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const scheduleDates = [
-    now,
-    new Date(now.getTime() + 5 * 60 * 1000),
-    new Date(now.getTime() + 60 * 60 * 1000),
-    new Date(now.getTime() + 8 * 60 * 60 * 1000),
-  ];
-
-  const queueRows = scheduleDates.map((scheduledAt, index) => ({
-    character_id: createdCharacter.id,
-    scheduled_at: scheduledAt.toISOString(),
-    sequence: index + 1,
-    status: "pending",
-  }));
+  const queueRows = buildFirstDayQueueRows(createdCharacter.id, now);
 
   const { error: queueError } = await admin.from("batch_queue").insert(queueRows);
   if (queueError) {
@@ -93,4 +82,3 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ character: createdCharacter }, { status: 201 });
 }
-
