@@ -1,23 +1,24 @@
 # ✦ AURA (오라) — Technical Requirements Document (TRD)
+
 ### AI KPOP 아이돌 가상 소셜 플랫폼 | MVP v0.1
 
 ---
 
 ## 0. 확정 스펙 스냅샷
 
-| 영역 | 기술 선택 | 비고 |
-|------|-----------|------|
-| Framework | Next.js 14+ (App Router) | Vercel 배포 |
-| UI 컴포넌트 | shadcn/ui + Tailwind CSS | |
-| Database | Supabase Postgres | |
-| Auth | Supabase Auth | Google OAuth + 이메일/비밀번호 |
-| Storage | Supabase Storage | 이미지/GIF 미디어 |
-| 배치 시스템 | Supabase Edge Functions + pg_cron | 하루 4건 자동 포스팅 |
-| LLM 호출 | Vercel AI SDK | Provider 추상화 (미정) |
-| 이미지 생성 | GCP Imagen 3 (Nano / Imagen 4 계열) | |
-| 영상 생성 | GCP Veo | MVP는 2~4초 루프 GIF |
-| 피드 업데이트 | Polling (interval fetch) | Realtime은 Phase 2 |
-| PWA | 미포함 | Phase 2 검토 |
+| 영역          | 기술 선택                           | 비고                                 |
+| ------------- | ----------------------------------- | ------------------------------------ |
+| Framework     | Next.js 14+ (App Router)            | Vercel 배포                          |
+| UI 컴포넌트   | shadcn/ui + Tailwind CSS            |                                      |
+| Database      | Supabase Postgres                   |                                      |
+| Auth          | Supabase Auth                       | Google OAuth + 이메일/비밀번호       |
+| Storage       | Supabase Storage                    | 이미지/GIF 미디어                    |
+| 배치 시스템   | Supabase Edge Functions + pg_cron   | 하루 4건 자동 포스팅                 |
+| LLM 호출      | GCP Gemini API (Vertex AI)          | Vercel AI SDK 제거, Gemini 단일 사용 |
+| 이미지 생성   | GCP Imagen 3 (Nano / Imagen 4 계열) |                                      |
+| 영상 생성     | GCP Veo                             | MVP는 2~4초 루프 GIF                 |
+| 피드 업데이트 | Polling (interval fetch)            | Realtime은 Phase 2                   |
+| PWA           | 미포함                              | Phase 2 검토                         |
 
 ---
 
@@ -41,10 +42,10 @@
 │  - Storage  │        └─────────────────────────────┘
 │  - Edge Fn  │
 └──────┬──────┘        ┌─────────────────────────────┐
-       │               │      Vercel AI SDK           │
+       │               │      GCP Gemini API          │
        │               │  - LLM 카피 생성             │
 ┌──────▼──────┐        │  - 캐릭터 메모리 서사 생성   │
-│  pg_cron    │        │  (Provider: TBD)             │
+│  pg_cron    │        │  (Model: Gemini 1.5 계열)    │
 │  배치 트리거│        └─────────────────────────────┘
 └─────────────┘
 ```
@@ -97,7 +98,7 @@ aura/
 │   │   ├── server.ts             # 서버용 Supabase client
 │   │   └── middleware.ts         # Auth 미들웨어
 │   ├── ai/
-│   │   ├── llm.ts                # Vercel AI SDK 래퍼 (provider 추상화)
+│   │   ├── llm.ts                # GCP Gemini API (Vertex AI) 호출 유틸
 │   │   ├── prompts.ts            # 캐릭터별 프롬프트 템플릿
 │   │   └── memory.ts             # 메모리 → 프롬프트 변환
 │   └── gcp/
@@ -118,6 +119,7 @@ aura/
 ## 3. 데이터베이스 스키마
 
 ### 3-1. users (Supabase Auth 기본 테이블 확장)
+
 ```sql
 -- auth.users는 Supabase 자동 생성
 -- 아래는 public.profiles로 확장
@@ -131,6 +133,7 @@ CREATE TABLE public.profiles (
 ```
 
 ### 3-2. characters (AI 아이돌 캐릭터)
+
 ```sql
 CREATE TABLE public.characters (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -180,6 +183,7 @@ CREATE INDEX idx_characters_fan_level ON public.characters(fan_level DESC);
 ```
 
 ### 3-3. posts (AI 자동 생성 포스팅)
+
 ```sql
 CREATE TABLE public.posts (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -212,6 +216,7 @@ CREATE INDEX idx_posts_status ON public.posts(status);
 ```
 
 ### 3-4. post_likes
+
 ```sql
 CREATE TABLE public.post_likes (
   post_id     UUID REFERENCES public.posts(id) ON DELETE CASCADE,
@@ -222,6 +227,7 @@ CREATE TABLE public.post_likes (
 ```
 
 ### 3-5. follows
+
 ```sql
 CREATE TABLE public.follows (
   follower_id  UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -234,6 +240,7 @@ CREATE INDEX idx_follows_character ON public.follows(character_id);
 ```
 
 ### 3-6. batch_queue (pg_cron 작업 추적)
+
 ```sql
 CREATE TABLE public.batch_queue (
   id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -250,6 +257,7 @@ CREATE INDEX idx_batch_queue_scheduled ON public.batch_queue(scheduled_at, statu
 ```
 
 ### 3-7. RLS (Row Level Security) 정책
+
 ```sql
 -- characters: 본인 캐릭터만 수정 가능, 전체 읽기 허용
 ALTER TABLE public.characters ENABLE ROW LEVEL SECURITY;
@@ -310,6 +318,7 @@ pg_cron (1분 간격 실행)
 ```
 
 ### 4-2. pg_cron 설정
+
 ```sql
 -- 1분마다 pending 배치 실행
 SELECT cron.schedule(
@@ -325,6 +334,7 @@ SELECT cron.schedule(
 ```
 
 ### 4-3. Edge Function 핵심 로직 (pseudo-code)
+
 ```typescript
 // supabase/functions/batch-post/index.ts
 
@@ -333,16 +343,17 @@ Deno.serve(async () => {
 
   // 처리할 배치 항목 조회 (한 번에 최대 10개)
   const { data: jobs } = await supabase
-    .from('batch_queue')
-    .select('*, characters(*)')
-    .lte('scheduled_at', new Date().toISOString())
-    .eq('status', 'pending')
+    .from("batch_queue")
+    .select("*, characters(*)")
+    .lte("scheduled_at", new Date().toISOString())
+    .eq("status", "pending")
     .limit(10);
 
   for (const job of jobs) {
-    await supabase.from('batch_queue')
-      .update({ status: 'processing', attempts: job.attempts + 1 })
-      .eq('id', job.id);
+    await supabase
+      .from("batch_queue")
+      .update({ status: "processing", attempts: job.attempts + 1 })
+      .eq("id", job.id);
 
     try {
       // 1. 활동 모드 랜덤 선택
@@ -355,17 +366,20 @@ Deno.serve(async () => {
       const imageBuffer = await generateImage(job.characters, caption);
 
       // 4. GIF 생성 (sequence=2일 때만, GCP Veo)
-      const mediaBuffer = job.sequence === 2
-        ? await generateGif(imageBuffer)
-        : imageBuffer;
+      const mediaBuffer =
+        job.sequence === 2 ? await generateGif(imageBuffer) : imageBuffer;
 
       // 5. Supabase Storage 업로드
-      const mediaUrl = await uploadMedia(supabase, job.character_id, mediaBuffer);
+      const mediaUrl = await uploadMedia(
+        supabase,
+        job.character_id,
+        mediaBuffer,
+      );
 
       // 6. posts INSERT
-      await supabase.from('posts').insert({
+      await supabase.from("posts").insert({
         character_id: job.character_id,
-        content_type: job.sequence === 2 ? 'moving_poster' : 'image',
+        content_type: job.sequence === 2 ? "moving_poster" : "image",
         caption,
         media_url: mediaUrl,
         batch_sequence: job.sequence,
@@ -375,15 +389,16 @@ Deno.serve(async () => {
       // 7. 메모리 업데이트
       await updateCharacterMemory(supabase, job.characters, caption, mode);
 
-      await supabase.from('batch_queue')
-        .update({ status: 'done', processed_at: new Date() })
-        .eq('id', job.id);
-
+      await supabase
+        .from("batch_queue")
+        .update({ status: "done", processed_at: new Date() })
+        .eq("id", job.id);
     } catch (e) {
-      const nextStatus = job.attempts >= 3 ? 'failed' : 'pending';
-      await supabase.from('batch_queue')
+      const nextStatus = job.attempts >= 3 ? "failed" : "pending";
+      await supabase
+        .from("batch_queue")
         .update({ status: nextStatus })
-        .eq('id', job.id);
+        .eq("id", job.id);
     }
   }
 });
@@ -391,30 +406,42 @@ Deno.serve(async () => {
 
 ---
 
-## 5. LLM 카피 생성 (Vercel AI SDK)
+## 5. LLM 카피 생성 (GCP Gemini API)
 
-### 5-1. Provider 추상화 구조
+### 5-1. Vertex AI Gemini 연동
+
 ```typescript
 // lib/ai/llm.ts
-import { generateText } from 'ai';
-// Provider는 환경변수로 주입 — 런칭 전 결정
-// 예: import { anthropic } from '@ai-sdk/anthropic'
-// 예: import { openai } from '@ai-sdk/openai'
-// 예: import { google } from '@ai-sdk/google'
+import { VertexAI } from "@google-cloud/vertexai";
 
-const model = getModelFromEnv(); // AI_PROVIDER 환경변수 기반
+const vertex = new VertexAI({
+  project: GCP_PROJECT_ID,
+  location: "us-central1",
+});
+// Gemini 1.5 계열 모델 사용
+const model = vertex.preview.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 export async function generateCaption(
   character: Character,
-  activityMode: string
+  activityMode: string,
 ): Promise<string> {
   const prompt = buildCaptionPrompt(character, activityMode);
-  const { text } = await generateText({ model, prompt, maxTokens: 200 });
-  return text;
+
+  const request = {
+    contents: [{ role: "user", parts: [{ text: prompt }] }],
+    generationConfig: {
+      maxOutputTokens: 200,
+      temperature: 0.7,
+    },
+  };
+
+  const response = await model.generateContent(request);
+  return response.response.candidates[0].content.parts[0].text;
 }
 ```
 
 ### 5-2. 프롬프트 구조
+
 ```typescript
 // lib/ai/prompts.ts
 
@@ -424,7 +451,7 @@ function buildCaptionPrompt(character: Character, mode: string): string {
 당신은 KPOP 아이돌 "${character.name}"입니다.
 
 [캐릭터 정보]
-- 포지션: ${character.position.join(', ')}
+- 포지션: ${character.position.join(", ")}
 - 컨셉: ${character.concept}
 - 무드: ${character.signature_mood}
 - 페르소나: ${character.persona}
@@ -432,8 +459,8 @@ function buildCaptionPrompt(character: Character, mode: string): string {
 
 [현재 서사]
 - 데뷔 이후 포스팅 수: ${memory.post_count}
-- 최근 이벤트: ${memory.last_event ?? '데뷔 직후'}
-- 주요 마일스톤: ${memory.milestones.slice(-3).join(' → ')}
+- 최근 이벤트: ${memory.last_event ?? "데뷔 직후"}
+- 주요 마일스톤: ${memory.milestones.slice(-3).join(" → ")}
 
 [오늘 활동 유형]: ${mode}
 
@@ -444,6 +471,7 @@ function buildCaptionPrompt(character: Character, mode: string): string {
 ```
 
 ### 5-3. 메모리 업데이트 로직
+
 ```typescript
 // lib/ai/memory.ts
 
@@ -451,7 +479,7 @@ export async function updateCharacterMemory(
   supabase: SupabaseClient,
   character: Character,
   caption: string,
-  mode: string
+  mode: string,
 ) {
   const currentMemory = character.memory;
   const newMilestone = generateMilestone(currentMemory.post_count, mode);
@@ -459,24 +487,24 @@ export async function updateCharacterMemory(
   const updatedMemory = {
     ...currentMemory,
     post_count: currentMemory.post_count + 1,
-    last_event: `${mode} 포스팅 (${new Date().toLocaleDateString('ko-KR')})`,
+    last_event: `${mode} 포스팅 (${new Date().toLocaleDateString("ko-KR")})`,
     milestones: newMilestone
       ? [...currentMemory.milestones, newMilestone].slice(-20) // 최대 20개 보관
       : currentMemory.milestones,
   };
 
   await supabase
-    .from('characters')
+    .from("characters")
     .update({ memory: updatedMemory, updated_at: new Date() })
-    .eq('id', character.id);
+    .eq("id", character.id);
 }
 
 // 마일스톤 이벤트 생성 규칙 (post_count 기반)
 function generateMilestone(count: number, mode: string): string | null {
-  if (count === 0) return '데뷔';
-  if (count === 5) return '첫 5개 포스팅 달성';
-  if (count === 10) return '팬 100명 돌파 (예정)';
-  if (count === 30) return '첫 트렌딩';
+  if (count === 0) return "데뷔";
+  if (count === 5) return "첫 5개 포스팅 달성";
+  if (count === 10) return "팬 100명 돌파 (예정)";
+  if (count === 30) return "첫 트렌딩";
   return null;
 }
 ```
@@ -486,30 +514,34 @@ function generateMilestone(count: number, mode: string): string | null {
 ## 6. GCP 이미지/영상 생성
 
 ### 6-1. Imagen 3 (이미지 생성)
+
 ```typescript
 // lib/gcp/imagen.ts
-import { VertexAI } from '@google-cloud/vertexai';
+import { VertexAI } from "@google-cloud/vertexai";
 
-const vertex = new VertexAI({ project: GCP_PROJECT_ID, location: 'us-central1' });
+const vertex = new VertexAI({
+  project: GCP_PROJECT_ID,
+  location: "us-central1",
+});
 
 export async function generateImage(
   character: Character,
-  caption: string
+  caption: string,
 ): Promise<Buffer> {
   const prompt = buildImagePrompt(character, caption);
 
   const model = vertex.preview.getGenerativeModel({
-    model: 'imagen-3.0-generate-001', // Imagen 3 / Nano 계열
+    model: "imagen-3.0-generate-001", // Imagen 3 / Nano 계열
   });
 
   const response = await model.generateImages({
     prompt,
     numberOfImages: 1,
-    aspectRatio: '9:16',  // 숏폼 세로 비율
-    safetyFilterLevel: 'BLOCK_MEDIUM_AND_ABOVE',
+    aspectRatio: "9:16", // 숏폼 세로 비율
+    safetyFilterLevel: "BLOCK_MEDIUM_AND_ABOVE",
   });
 
-  return Buffer.from(response.images[0].imageBytes, 'base64');
+  return Buffer.from(response.images[0].imageBytes, "base64");
 }
 
 function buildImagePrompt(character: Character, caption: string): string {
@@ -520,26 +552,27 @@ function buildImagePrompt(character: Character, caption: string): string {
     `high quality, 4K, detailed, no real person resemblance,`,
     `original fictional AI character only,`,
     `scene: ${caption.slice(0, 80)}`,
-  ].join(' ');
+  ].join(" ");
 }
 ```
 
 ### 6-2. Veo (루프 GIF 생성)
+
 ```typescript
 // lib/gcp/veo.ts
 // Veo: 이미지 → 2~4초 애니메이션 생성
 
 export async function generateLoopGif(
   imageBuffer: Buffer,
-  character: Character
+  character: Character,
 ): Promise<Buffer> {
   // Veo API: 정적 이미지 → 짧은 루프 영상
   const response = await veoClient.generateVideo({
-    image: imageBuffer.toString('base64'),
+    image: imageBuffer.toString("base64"),
     durationSeconds: 3,
     loop: true,
     prompt: `subtle motion, ${character.signature_mood} vibe, glowing neon effect`,
-    aspectRatio: '9:16',
+    aspectRatio: "9:16",
   });
 
   // MP4 → GIF 변환 (서버사이드 ffmpeg or GCP 제공 GIF export)
@@ -548,6 +581,7 @@ export async function generateLoopGif(
 ```
 
 ### 6-3. Supabase Storage 업로드
+
 ```typescript
 // lib/supabase/storage.ts
 
@@ -555,21 +589,21 @@ export async function uploadMedia(
   supabase: SupabaseClient,
   characterId: string,
   buffer: Buffer,
-  type: 'image' | 'gif'
+  type: "image" | "gif",
 ): Promise<string> {
-  const ext = type === 'gif' ? 'gif' : 'webp';
+  const ext = type === "gif" ? "gif" : "webp";
   const path = `posts/${characterId}/${Date.now()}.${ext}`;
 
   const { error } = await supabase.storage
-    .from('aura-media')
+    .from("aura-media")
     .upload(path, buffer, {
-      contentType: type === 'gif' ? 'image/gif' : 'image/webp',
-      cacheControl: '31536000', // 1년 캐시
+      contentType: type === "gif" ? "image/gif" : "image/webp",
+      cacheControl: "31536000", // 1년 캐시
     });
 
   if (error) throw error;
 
-  const { data } = supabase.storage.from('aura-media').getPublicUrl(path);
+  const { data } = supabase.storage.from("aura-media").getPublicUrl(path);
   return data.publicUrl;
 }
 ```
@@ -638,6 +672,7 @@ GET /api/ranking
 ```
 
 ### 7-4. 에러 응답 포맷
+
 ```typescript
 // 모든 API 공통 에러 포맷
 {
@@ -653,21 +688,26 @@ GET /api/ranking
 ## 8. 인증 & 미들웨어
 
 ### 8-1. Supabase Auth 설정
+
 ```typescript
 // lib/supabase/middleware.ts
-import { createServerClient } from '@supabase/ssr';
-import { NextResponse, type NextRequest } from 'next/server';
+import { createServerClient } from "@supabase/ssr";
+import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
   const supabase = createServerClient(/* ... */);
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
 
   // 보호된 라우트 접근 시 로그인 리디렉트
-  const protectedPaths = ['/manage', '/api/characters', '/api/follow'];
-  const isProtected = protectedPaths.some(p => request.nextUrl.pathname.startsWith(p));
+  const protectedPaths = ["/manage", "/api/characters", "/api/follow"];
+  const isProtected = protectedPaths.some((p) =>
+    request.nextUrl.pathname.startsWith(p),
+  );
 
   if (isProtected && !session) {
-    return NextResponse.redirect(new URL('/login', request.url));
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   return NextResponse.next();
@@ -675,11 +715,12 @@ export async function middleware(request: NextRequest) {
 ```
 
 ### 8-2. 지원 로그인 방식
+
 ```typescript
 // Google OAuth
 await supabase.auth.signInWithOAuth({
-  provider: 'google',
-  options: { redirectTo: `${origin}/auth/callback` }
+  provider: "google",
+  options: { redirectTo: `${origin}/auth/callback` },
 });
 
 // 이메일 + 비밀번호
@@ -693,22 +734,18 @@ await supabase.auth.signUp({ email, password });
 
 ```typescript
 // components/feed/FeedPolling.tsx
-'use client';
+"use client";
 
-import useSWR from 'swr';
+import useSWR from "swr";
 
 const POLL_INTERVAL = 30_000; // 30초
 
-export function useFeed(tab: 'recommended' | 'following' | 'mine') {
-  const { data, error, isLoading } = useSWR(
-    `/api/feed?tab=${tab}`,
-    fetcher,
-    {
-      refreshInterval: POLL_INTERVAL,
-      revalidateOnFocus: true,
-      dedupingInterval: 5_000,
-    }
-  );
+export function useFeed(tab: "recommended" | "following" | "mine") {
+  const { data, error, isLoading } = useSWR(`/api/feed?tab=${tab}`, fetcher, {
+    refreshInterval: POLL_INTERVAL,
+    revalidateOnFocus: true,
+    dedupingInterval: 5_000,
+  });
 
   return { posts: data?.posts ?? [], isLoading, error };
 }
@@ -731,11 +768,9 @@ GCP_PROJECT_ID=
 GCP_LOCATION=us-central1
 GOOGLE_APPLICATION_CREDENTIALS=   # 서비스 계정 JSON 경로
 
-# AI (미정 — 런칭 전 결정)
-AI_PROVIDER=                      # anthropic | openai | google
-ANTHROPIC_API_KEY=                # Provider에 따라 선택 사용
-OPENAI_API_KEY=
-GOOGLE_AI_API_KEY=
+# AI (GCP Gemini API 전용)
+# Vercel AI SDK 및 타사 Provider(OpenAI, Anthropic) 제외
+# GCP_PROJECT_ID 와 GOOGLE_APPLICATION_CREDENTIALS 로 통합 인증
 
 # App
 NEXT_PUBLIC_APP_URL=
@@ -747,16 +782,17 @@ NEXT_PUBLIC_APP_URL=
 
 > ⚠️ 검증 필요 — API 단가는 변동 가능, 아래는 추정치
 
-| 항목 | 단가 (추정) | 캐릭터 100개 × 4건/일 기준 |
-|------|------------|--------------------------|
-| GCP Imagen 3 이미지 생성 | ~$0.04/장 | ~$160/월 |
-| GCP Veo GIF (2~4초) | ~$0.10/건 | ~$400/월 (2회/캐릭터/일 가정) |
-| LLM 카피 생성 | ~$0.001/건 | ~$12/월 |
-| Supabase (Pro) | $25/월 flat | — |
-| Vercel (Pro) | $20/월 flat | — |
-| **합계** | | **~$617/월** |
+| 항목                     | 단가 (추정) | 캐릭터 100개 × 4건/일 기준    |
+| ------------------------ | ----------- | ----------------------------- |
+| GCP Imagen 3 이미지 생성 | ~$0.04/장   | ~$160/월                      |
+| GCP Veo GIF (2~4초)      | ~$0.10/건   | ~$400/월 (2회/캐릭터/일 가정) |
+| LLM 카피 생성            | ~$0.001/건  | ~$12/월                       |
+| Supabase (Pro)           | $25/월 flat | —                             |
+| Vercel (Pro)             | $20/월 flat | —                             |
+| **합계**                 |             | **~$617/월**                  |
 
 **비용 경감 전략:**
+
 - Free 유저: 이미지 3개/일 + GIF 2개/주로 생성 제한
 - GIF는 sequence=2 (하루 1회)만 생성, 나머지 3회는 이미지만
 - 인기 하위 캐릭터는 배치 빈도 자동 감소 (Phase 2)
@@ -774,7 +810,7 @@ P0 (Week 1) — 작동하는 뼈대
   └── 배치 큐 등록 로직
 
 P1 (Week 1~2) — 핵심 기능
-  ├── LLM 카피 생성 연동 (Vercel AI SDK)
+  ├── LLM 카피 생성 연동 (GCP Gemini API)
   ├── GCP Imagen 이미지 생성 연동
   ├── 배치 Edge Function + pg_cron 설정
   ├── 메인 피드 UI (3탭 + 폴링)
@@ -797,14 +833,14 @@ P3 (Week 3~4) — 검증 후 개선
 
 ## 13. 미결 사항 (TBD)
 
-| 항목 | 현황 | 결정 필요 시점 |
-|------|------|---------------|
-| LLM Provider | 미정 (코드 추상화 완료) | P1 시작 전 |
-| Veo API 정식 접근 | GCP 신청 필요 | Week 1 즉시 |
-| 도메인 / 브랜딩 | 미정 | 소프트 런칭 전 |
-| 콘텐츠 모더레이션 | 미포함 | Phase 2 |
-| PWA | 미포함 | Phase 2 |
+| 항목              | 현황                        | 결정 필요 시점 |
+| ----------------- | --------------------------- | -------------- |
+| GCP Vertex AI     | API 접근 권한 (할당량) 확인 | P1 시작 전     |
+| Veo API 정식 접근 | GCP 신청 필요               | Week 1 즉시    |
+| 도메인 / 브랜딩   | 미정                        | 소프트 런칭 전 |
+| 콘텐츠 모더레이션 | 미포함                      | Phase 2        |
+| PWA               | 미포함                      | Phase 2        |
 
 ---
 
-*✦ AURA — AI가 활동하는 아이돌, 당신이 키운다 ✦*
+_✦ AURA — AI가 활동하는 아이돌, 당신이 키운다 ✦_

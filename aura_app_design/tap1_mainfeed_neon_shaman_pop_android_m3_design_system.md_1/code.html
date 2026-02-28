@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AURA - Trending Idol Feed</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style type="text/tailwindcss">
+        :root {--md-sys-color-surface: #0B0F14;
+            --md-sys-color-surface-variant: #121722;
+            --md-sys-color-surface-container: #161C26;
+            --md-sys-color-on-surface: #E6E1E5;
+            --md-sys-color-on-surface-variant: #CAC4D0;
+            --md-sys-color-outline: rgba(255, 255, 255, 0.08);--aura-neon-pink: #FF2F92;
+            --aura-neon-violet: #8A5CFF;
+            --aura-neon-cyan: #00F0FF;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--md-sys-color-surface);
+            color: var(--md-sys-color-on-surface);
+            overflow: hidden;}.label-medium {
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 16px;
+            letter-spacing: 0.5px;
+        }
+        .label-large {
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 20px;
+            letter-spacing: 0.1px;
+        }
+        .body-medium {
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 20px;
+            letter-spacing: 0.25px;
+        }
+        .title-large {
+            font-size: 22px;
+            font-weight: 400;
+            line-height: 28px;
+        }.neon-text-shadow {
+            text-shadow: 0 0 8px rgba(255, 47, 146, 0.5);
+        }
+        .glass-panel {
+            background: rgba(11, 15, 20, 0.4);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }.no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }@keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+            animation: spin 8s linear infinite;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.filled {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="h-screen w-full relative select-none">
+<div class="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuChuuFsB0vIMdv2olRy0TYSR74FBK0Si0IIRl_T4vEZnbIMcF4X-j8RlLF1MBJVREIPmYL5Se_OuTsBkVwv_Ssw9htgCEOacZEaBia9gRsLSqbfmPSsrenzoNnXbyeOaW4F8QMyC_oWRto1H9di7Z5P4MhtQpnlLReFxZunKO2pGSlidTGc7mDvQl86xCF15YLJgy_8VhKyHeSoKSDCO6rxLRqstkf8dPBKOhbr8AWTfNU7LMAoT6WCcvl77s9LxYzTFtkyxVftxXFt');">
+<div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80"></div>
+</div>
+<header class="absolute top-0 left-0 w-full z-20 pt-12 pb-2 px-4 flex justify-between items-center">
+<div class="w-12 h-12 flex items-center justify-center">
+<img alt="AURA Logo" class="h-10 w-auto drop-shadow-[0_0_10px_rgba(255,47,146,0.5)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhlPnxGVc2K9K5MYVvSsjyxl3vIhtLitTEeXZjN5ekGtznMuxaR39UQWrPLeCianDlyf5Ib9rQual78idkOkothO96ci6VRZ6T_KzyVFk7vzKhgid9NVvoILaOUbEgfVsbxHyYkTBf-AuuixF6JYsK6wkuvM9iXOwo61arH_Ih1Lz-E270TVIx3H9juyFm5jkzTSPMa4XsikjVPCvsVKyFBAc70T91pRncayPzC9nAuHa0zG6a_7fQ3tAkbUKO0WuOEbHIUBqOtN_9"/>
+</div>
+<div class="flex space-x-6 text-[var(--md-sys-color-on-surface-variant)] label-large">
+<button class="relative text-white font-bold">
+                Trending
+                <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-6 h-[2px] bg-[var(--aura-neon-pink)] shadow-[0_0_8px_var(--aura-neon-pink)] rounded-full"></div>
+</button>
+<button class="hover:text-white transition-colors">Following</button>
+<button class="hover:text-white transition-colors">My Idols</button>
+</div>
+<div class="w-12 h-12 flex items-center justify-center">
+<span class="material-symbols-outlined text-white">search</span>
+</div>
+</header>
+<main class="absolute inset-0 z-10 flex flex-col justify-end pb-[88px]"> 
+<div class="flex flex-row items-end px-4 mb-4">
+<div class="flex-1 flex flex-col space-y-3 mr-12">
+<div class="flex items-center space-x-2">
+<span class="title-large text-white font-bold drop-shadow-md">@mystic_yuna</span>
+<span class="px-2 py-0.5 rounded-full bg-[var(--aura-neon-violet)]/20 border border-[var(--aura-neon-violet)] text-[var(--aura-neon-violet)] text-[10px] font-bold tracking-wider uppercase backdrop-blur-sm">
+                        SHAMAN GEN 3
+                    </span>
+</div>
+<p class="body-medium text-white/90 line-clamp-2 drop-shadow-sm">
+                    Summoning new vibes for the ritual tonight. Can you feel the energy? ✨🔮 #AURA #KPopAI #CyberShaman
+                </p>
+<div class="flex items-center space-x-2 text-white/80">
+<span class="material-symbols-outlined text-[16px] animate-spin-slow">music_note</span>
+<div class="overflow-hidden w-40">
+<span class="label-medium whitespace-nowrap">Neon Dreams (Original Mix) - AURA Beats</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-center space-y-6 min-w-[56px]">
+<div class="relative mb-2">
+<div class="w-12 h-12 rounded-full border-2 border-white p-[1px] overflow-hidden">
+<img alt="Profile" class="w-full h-full object-cover rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDK9LVgYtqPQ9esk-l1dI4mJaT4hGQVEvK2yfrfSD6tOur0HjlW6sCUqn2_YNvGPTl8NXZqPhRMasXugGrGFsj4Hp-VERVvAWf9X42QZVFprM1SRD0LhmMg8nyR50SAzjNRe601SzjNMgWaGDYIa-kpcIHDpMRoseC7mQp4vxGQjtin49gayZ3VVgfEJleC28_hJU421fWqCygzFseu59kILm4BRjXQX0MriWnrKD4vG3gWRVCoKLX2fdX1wSL3uc2A4xPLRw12Wthb"/>
+</div>
+<div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-[var(--aura-neon-pink)] rounded-full w-5 h-5 flex items-center justify-center shadow-[0_0_8px_rgba(255,47,146,0.6)]">
+<span class="material-symbols-outlined text-white text-[14px] font-bold">add</span>
+</div>
+</div>
+<div class="flex flex-col items-center space-y-1">
+<button class="w-10 h-10 flex items-center justify-center rounded-full active:scale-90 transition-transform">
+<span class="material-symbols-outlined filled text-[var(--aura-neon-pink)] text-[32px] drop-shadow-[0_0_12px_var(--aura-neon-pink)]">favorite</span>
+</button>
+<span class="text-white text-[12px] font-medium drop-shadow-md">24.5K</span>
+</div>
+<div class="flex flex-col items-center space-y-1">
+<button class="w-10 h-10 flex items-center justify-center rounded-full active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-white text-[30px] drop-shadow-md">chat_bubble</span>
+</button>
+<span class="text-white text-[12px] font-medium drop-shadow-md">1,203</span>
+</div>
+<div class="flex flex-col items-center space-y-1">
+<button class="w-10 h-10 flex items-center justify-center rounded-full active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-white text-[30px] drop-shadow-md">share</span>
+</button>
+<span class="text-white text-[12px] font-medium drop-shadow-md">Share</span>
+</div>
+<div class="mt-4 relative w-12 h-12 flex items-center justify-center">
+<div class="w-12 h-12 rounded-full bg-[var(--md-sys-color-surface-container)] border-[6px] border-[var(--md-sys-color-surface-variant)] animate-spin-slow overflow-hidden flex items-center justify-center">
+<img class="w-full h-full object-cover opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDutUAuOKdqyEz8TE9gQsR1bzhNioRt6TvpVgPQWVjo1-ihgGcgoaDn2MAyij14mWn2bylC8ipPO9WrJRgblKjueW7uv7XxvC6cQXdEgR6KLO9r770CLdPJ_iZohDdkZ_ZkO547Qx-GrONyPTPQpJ76-jwC4BGrNBycNf68nizpno5A4BvGGFox95uepIQTkcMF5ybSHvucf8Y7mxrQ5CVSHrliD0cxh8P7oEb5R2u97wHY_3aj6u4edGGXlrGtC7YqIf08oQ8pmXRF"/>
+</div>
+<span class="material-symbols-outlined absolute -top-4 -right-2 text-[var(--aura-neon-cyan)] text-[14px] opacity-80" style="transform: rotate(15deg);">music_note</span>
+<span class="material-symbols-outlined absolute -top-8 right-0 text-[var(--aura-neon-violet)] text-[10px] opacity-60" style="transform: rotate(-10deg);">music_note</span>
+</div>
+</div>
+</div>
+</main>
+<nav class="fixed bottom-0 w-full h-[80px] bg-[var(--md-sys-color-surface)]/95 border-t border-[var(--md-sys-color-outline)] backdrop-blur-lg flex justify-around items-center px-2 z-50 text-[var(--md-sys-color-on-surface-variant)]">
+<div class="flex flex-col items-center justify-center w-16 group cursor-pointer text-[var(--aura-neon-pink)]">
+<div class="h-8 w-16 flex items-center justify-center rounded-full group-hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined filled">home</span>
+</div>
+<span class="text-[12px] font-medium mt-1">Home</span>
+</div>
+<div class="flex flex-col items-center justify-center w-16 group cursor-pointer hover:text-white transition-colors">
+<div class="h-8 w-16 flex items-center justify-center rounded-full group-hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined">leaderboard</span>
+</div>
+<span class="text-[12px] font-medium mt-1">Ranking</span>
+</div>
+<div class="flex flex-col items-center justify-center w-16 group cursor-pointer -mt-4">
+<div class="h-14 w-14 flex items-center justify-center rounded-full bg-gradient-to-tr from-[var(--aura-neon-violet)] to-[var(--aura-neon-pink)] shadow-[0_0_15px_rgba(255,47,146,0.4)] hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-white text-[28px]">add</span>
+</div>
+</div>
+<div class="flex flex-col items-center justify-center w-16 group cursor-pointer hover:text-white transition-colors">
+<div class="h-8 w-16 flex items-center justify-center rounded-full group-hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined">auto_fix_high</span>
+</div>
+<span class="text-[12px] font-medium mt-1">Manage</span>
+</div>
+<div class="flex flex-col items-center justify-center w-16 group cursor-pointer hover:text-white transition-colors">
+<div class="h-8 w-16 flex items-center justify-center rounded-full group-hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined">person</span>
+</div>
+<span class="text-[12px] font-medium mt-1">Profile</span>
+</div>
+</nav>
+<div class="fixed bottom-1 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-white/20 rounded-full z-50 pointer-events-none"></div>
+
+</body></html>

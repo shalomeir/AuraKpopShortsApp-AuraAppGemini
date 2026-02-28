@@ -1,4 +1,5 @@
 # ✦ AURA (오라) — Information Architecture (IA)
+
 ### AI KPOP 아이돌 가상 소셜 플랫폼 | MVP v0.1
 
 ---
@@ -39,18 +40,18 @@ AURA
 
 ## 1. 화면(Page) 목록 & URL 구조
 
-| # | 화면명 | URL | Auth | 설명 |
-|---|--------|-----|:----:|------|
-| 1 | 피드 (홈) | `/` | 선택 | 메인 숏폼 피드, 3탭 |
-| 2 | 로그인 | `/login` | ✗ | Google OAuth + 이메일 |
-| 3 | 회원가입 | `/signup` | ✗ | 이메일 회원가입 |
-| 4 | OAuth 콜백 | `/auth/callback` | — | Supabase 내부 처리 |
-| 5 | 랭킹 | `/ranking` | ✗ | AI 캐릭터 리더보드 |
-| 6 | 캐릭터 생성 | `/character/new` | ✅ | 4단계 위저드 |
-| 7 | 캐릭터 프로필 | `/character/[id]` | ✗ | 캐릭터 상세 + 피드 |
-| 8 | 매니지먼트 | `/manage` | ✅ | 내 캐릭터 관리 목록 |
-| 9 | 캐릭터 관리 상세 | `/manage/[id]` | ✅ | 스탯, 배치 현황, 메모리 |
-| 10 | 내 프로필 | `/profile` | ✅ | 계정 정보, 팔로우 목록 |
+| #   | 화면명           | URL               | Auth | 설명                    |
+| --- | ---------------- | ----------------- | :--: | ----------------------- |
+| 1   | 피드 (홈)        | `/`               | 선택 | 메인 숏폼 피드, 3탭     |
+| 2   | 로그인           | `/login`          |  ✗   | Google OAuth + 이메일   |
+| 3   | 회원가입         | `/signup`         |  ✗   | 이메일 회원가입         |
+| 4   | OAuth 콜백       | `/auth/callback`  |  —   | Supabase 내부 처리      |
+| 5   | 랭킹             | `/ranking`        |  ✗   | AI 캐릭터 리더보드      |
+| 6   | 캐릭터 생성      | `/character/new`  |  ✅  | 4단계 위저드            |
+| 7   | 캐릭터 프로필    | `/character/[id]` |  ✗   | 캐릭터 상세 + 피드      |
+| 8   | 매니지먼트       | `/manage`         |  ✅  | 내 캐릭터 관리 목록     |
+| 9   | 캐릭터 관리 상세 | `/manage/[id]`    |  ✅  | 스탯, 배치 현황, 메모리 |
+| 10  | 내 프로필        | `/profile`        |  ✅  | 계정 정보, 팔로우 목록  |
 
 ---
 
@@ -79,6 +80,7 @@ AURA
 ```
 
 **데이터 의존:**
+
 - `posts` (status=published, created_at DESC)
 - `characters` (name, avatar)
 - `post_likes` (좋아요 여부 확인, auth 유저)
@@ -102,6 +104,7 @@ AURA
 ```
 
 **데이터 의존:**
+
 - `characters` (follower_count DESC, fan_level DESC)
 - 정렬: `follower_count * 0.6 + fan_level * 0.4` (가중치 점수)
 
@@ -148,6 +151,7 @@ AURA
 ```
 
 **생성 시 트리거:**
+
 - `characters` INSERT
 - `batch_queue` 4건 INSERT (T+0, T+5m, T+1h, T+8h)
 - 초기 `memory` JSONB 세팅 (debut_story 자동 생성)
@@ -178,6 +182,7 @@ AURA
 ```
 
 **데이터 의존:**
+
 - `characters` (단건)
 - `posts` (character_id 기준, published만)
 - `follows` (현재 유저 팔로우 여부)
@@ -235,6 +240,7 @@ AURA
 ```
 
 **데이터 의존:**
+
 - `characters` (단건, owner_id = 현재 유저)
 - `batch_queue` (오늘 날짜, character_id 기준)
 - `posts` (집계: SUM like_count, SUM view_count)
@@ -303,42 +309,43 @@ AURA
 
 ### 4-1. profiles
 
-| 컬럼 | 타입 | 제약 | 설명 |
-|------|------|------|------|
-| id | UUID | PK, FK → auth.users | Supabase Auth 연동 |
-| username | TEXT | UNIQUE, NULLABLE | 닉네임 (선택 입력) |
-| avatar_url | TEXT | NULLABLE | 프로필 이미지 |
-| created_at | TIMESTAMPTZ | DEFAULT NOW() | |
+| 컬럼       | 타입        | 제약                | 설명               |
+| ---------- | ----------- | ------------------- | ------------------ |
+| id         | UUID        | PK, FK → auth.users | Supabase Auth 연동 |
+| username   | TEXT        | UNIQUE, NULLABLE    | 닉네임 (선택 입력) |
+| avatar_url | TEXT        | NULLABLE            | 프로필 이미지      |
+| created_at | TIMESTAMPTZ | DEFAULT NOW()       |                    |
 
 ---
 
 ### 4-2. characters
 
-| 컬럼 | 타입 | 제약 | 설명 |
-|------|------|------|------|
-| id | UUID | PK | |
-| owner_id | UUID | FK → profiles, NOT NULL | 캐릭터 소유자 |
-| name | TEXT | NOT NULL | 캐릭터 이름 |
-| gender | TEXT | | female / male / nonbinary |
-| age_range | TEXT | | teen / twenties / thirties |
-| nationality | TEXT | | |
-| face_shape | TEXT | | |
-| hair_color | TEXT | | |
-| fashion_mood | TEXT | | |
-| concept | TEXT | | cute / sexy / boyish / innocent |
-| position | TEXT[] | | 복수 선택 (최대 2) |
-| signature_mood | TEXT | | bright / dark / mysterious / comic |
-| persona | TEXT | | casual / perfect / quirky / artist |
-| comment_tone | TEXT | DEFAULT 'friendly' | friendly / provocative / chic / playful |
-| activity_modes | TEXT[] | DEFAULT 전체 | 활동 모드 목록 |
-| memory | JSONB | DEFAULT 초기값 | 서사 누적 (하단 스키마 참고) |
-| fan_level | INT | DEFAULT 0 | 팔로워+조회 기반 레벨 |
-| follower_count | INT | DEFAULT 0 | 정규화 카운트 캐시 |
-| is_active | BOOLEAN | DEFAULT TRUE | 소프트 딜리트용 |
-| created_at | TIMESTAMPTZ | DEFAULT NOW() | |
-| updated_at | TIMESTAMPTZ | DEFAULT NOW() | |
+| 컬럼           | 타입        | 제약                    | 설명                                    |
+| -------------- | ----------- | ----------------------- | --------------------------------------- |
+| id             | UUID        | PK                      |                                         |
+| owner_id       | UUID        | FK → profiles, NOT NULL | 캐릭터 소유자                           |
+| name           | TEXT        | NOT NULL                | 캐릭터 이름                             |
+| gender         | TEXT        |                         | female / male / nonbinary               |
+| age_range      | TEXT        |                         | teen / twenties / thirties              |
+| nationality    | TEXT        |                         |                                         |
+| face_shape     | TEXT        |                         |                                         |
+| hair_color     | TEXT        |                         |                                         |
+| fashion_mood   | TEXT        |                         |                                         |
+| concept        | TEXT        |                         | cute / sexy / boyish / innocent         |
+| position       | TEXT[]      |                         | 복수 선택 (최대 2)                      |
+| signature_mood | TEXT        |                         | bright / dark / mysterious / comic      |
+| persona        | TEXT        |                         | casual / perfect / quirky / artist      |
+| comment_tone   | TEXT        | DEFAULT 'friendly'      | friendly / provocative / chic / playful |
+| activity_modes | TEXT[]      | DEFAULT 전체            | 활동 모드 목록                          |
+| memory         | JSONB       | DEFAULT 초기값          | 서사 누적 (하단 스키마 참고)            |
+| fan_level      | INT         | DEFAULT 0               | 팔로워+조회 기반 레벨                   |
+| follower_count | INT         | DEFAULT 0               | 정규화 카운트 캐시                      |
+| is_active      | BOOLEAN     | DEFAULT TRUE            | 소프트 딜리트용                         |
+| created_at     | TIMESTAMPTZ | DEFAULT NOW()           |                                         |
+| updated_at     | TIMESTAMPTZ | DEFAULT NOW()           |                                         |
 
 **memory JSONB 스키마:**
+
 ```json
 {
   "debut_story": "데뷔 스토리 텍스트",
@@ -355,28 +362,29 @@ AURA
 
 ### 4-3. posts
 
-| 컬럼 | 타입 | 제약 | 설명 |
-|------|------|------|------|
-| id | UUID | PK | |
-| character_id | UUID | FK → characters, NOT NULL | |
-| content_type | TEXT | NOT NULL | image / moving_poster |
-| caption | TEXT | | LLM 생성 캡션 |
-| media_url | TEXT | | Supabase Storage 공개 URL |
-| media_thumb_url | TEXT | | 썸네일 URL |
-| activity_mode | TEXT | | 생성 시 사용된 활동 모드 |
-| batch_sequence | INT | | 1~4 |
-| generation_meta | JSONB | DEFAULT {} | 프롬프트/모델 버전 로깅 |
-| like_count | INT | DEFAULT 0 | 카운트 캐시 |
-| view_count | INT | DEFAULT 0 | 카운트 캐시 |
-| share_count | INT | DEFAULT 0 | 카운트 캐시 |
-| status | TEXT | DEFAULT 'published' | generating / published / failed |
-| created_at | TIMESTAMPTZ | DEFAULT NOW() | |
+| 컬럼            | 타입        | 제약                      | 설명                            |
+| --------------- | ----------- | ------------------------- | ------------------------------- |
+| id              | UUID        | PK                        |                                 |
+| character_id    | UUID        | FK → characters, NOT NULL |                                 |
+| content_type    | TEXT        | NOT NULL                  | image / moving_poster           |
+| caption         | TEXT        |                           | LLM 생성 캡션                   |
+| media_url       | TEXT        |                           | Supabase Storage 공개 URL       |
+| media_thumb_url | TEXT        |                           | 썸네일 URL                      |
+| activity_mode   | TEXT        |                           | 생성 시 사용된 활동 모드        |
+| batch_sequence  | INT         |                           | 1~4                             |
+| generation_meta | JSONB       | DEFAULT {}                | 프롬프트/모델 버전 로깅         |
+| like_count      | INT         | DEFAULT 0                 | 카운트 캐시                     |
+| view_count      | INT         | DEFAULT 0                 | 카운트 캐시                     |
+| share_count     | INT         | DEFAULT 0                 | 카운트 캐시                     |
+| status          | TEXT        | DEFAULT 'published'       | generating / published / failed |
+| created_at      | TIMESTAMPTZ | DEFAULT NOW()             |                                 |
 
 **generation_meta JSONB 예시:**
+
 ```json
 {
-  "llm_provider": "anthropic",
-  "llm_model": "claude-sonnet-4-5",
+  "llm_provider": "gemini",
+  "llm_model": "gemini-1.5-flash",
   "image_model": "imagen-3.0-generate-001",
   "prompt_version": "v1.2",
   "generation_time_ms": 4200
@@ -387,11 +395,11 @@ AURA
 
 ### 4-4. post_likes
 
-| 컬럼 | 타입 | 제약 | 설명 |
-|------|------|------|------|
-| post_id | UUID | PK, FK → posts | |
-| user_id | UUID | PK, FK → profiles | |
-| created_at | TIMESTAMPTZ | DEFAULT NOW() | |
+| 컬럼       | 타입        | 제약              | 설명 |
+| ---------- | ----------- | ----------------- | ---- |
+| post_id    | UUID        | PK, FK → posts    |      |
+| user_id    | UUID        | PK, FK → profiles |      |
+| created_at | TIMESTAMPTZ | DEFAULT NOW()     |      |
 
 복합 PK로 중복 좋아요 방지. UPSERT 활용.
 
@@ -399,44 +407,44 @@ AURA
 
 ### 4-5. follows
 
-| 컬럼 | 타입 | 제약 | 설명 |
-|------|------|------|------|
-| follower_id | UUID | PK, FK → profiles | 팔로우한 유저 |
-| character_id | UUID | PK, FK → characters | 팔로우된 캐릭터 |
-| created_at | TIMESTAMPTZ | DEFAULT NOW() | |
+| 컬럼         | 타입        | 제약                | 설명            |
+| ------------ | ----------- | ------------------- | --------------- |
+| follower_id  | UUID        | PK, FK → profiles   | 팔로우한 유저   |
+| character_id | UUID        | PK, FK → characters | 팔로우된 캐릭터 |
+| created_at   | TIMESTAMPTZ | DEFAULT NOW()       |                 |
 
 ---
 
 ### 4-6. batch_queue
 
-| 컬럼 | 타입 | 제약 | 설명 |
-|------|------|------|------|
-| id | UUID | PK | |
-| character_id | UUID | FK → characters, NOT NULL | |
-| scheduled_at | TIMESTAMPTZ | NOT NULL | 실행 예정 시각 |
-| sequence | INT | NOT NULL | 1~4 (하루 4건 중 순서) |
-| status | TEXT | DEFAULT 'pending' | pending / processing / done / failed |
-| attempts | INT | DEFAULT 0 | 재시도 횟수 (최대 3) |
-| created_at | TIMESTAMPTZ | DEFAULT NOW() | |
-| processed_at | TIMESTAMPTZ | NULLABLE | 완료 시각 |
+| 컬럼         | 타입        | 제약                      | 설명                                 |
+| ------------ | ----------- | ------------------------- | ------------------------------------ |
+| id           | UUID        | PK                        |                                      |
+| character_id | UUID        | FK → characters, NOT NULL |                                      |
+| scheduled_at | TIMESTAMPTZ | NOT NULL                  | 실행 예정 시각                       |
+| sequence     | INT         | NOT NULL                  | 1~4 (하루 4건 중 순서)               |
+| status       | TEXT        | DEFAULT 'pending'         | pending / processing / done / failed |
+| attempts     | INT         | DEFAULT 0                 | 재시도 횟수 (최대 3)                 |
+| created_at   | TIMESTAMPTZ | DEFAULT NOW()             |                                      |
+| processed_at | TIMESTAMPTZ | NULLABLE                  | 완료 시각                            |
 
 ---
 
 ## 5. ENUM 값 정의 (전체 허용값 정리)
 
-| 엔티티 | 컬럼 | 허용값 |
-|--------|------|--------|
-| characters | gender | `female` `male` `nonbinary` |
-| characters | age_range | `teen` `twenties` `thirties` |
-| characters | concept | `cute` `sexy` `boyish` `innocent` |
-| characters | position[] | `main_vocal` `main_dancer` `rapper` `visual` `leader` `entertainer` |
-| characters | signature_mood | `bright` `dark` `mysterious` `comic` |
-| characters | persona | `casual` `perfect` `quirky` `artist` |
-| characters | comment_tone | `friendly` `provocative` `chic` `playful` |
-| characters | activity_modes[] | `performance` `daily` `meme` `travel` `entertainment` `photoshoot` `drama` `fan` |
-| posts | content_type | `image` `moving_poster` |
-| posts | status | `generating` `published` `failed` |
-| batch_queue | status | `pending` `processing` `done` `failed` |
+| 엔티티      | 컬럼             | 허용값                                                                           |
+| ----------- | ---------------- | -------------------------------------------------------------------------------- |
+| characters  | gender           | `female` `male` `nonbinary`                                                      |
+| characters  | age_range        | `teen` `twenties` `thirties`                                                     |
+| characters  | concept          | `cute` `sexy` `boyish` `innocent`                                                |
+| characters  | position[]       | `main_vocal` `main_dancer` `rapper` `visual` `leader` `entertainer`              |
+| characters  | signature_mood   | `bright` `dark` `mysterious` `comic`                                             |
+| characters  | persona          | `casual` `perfect` `quirky` `artist`                                             |
+| characters  | comment_tone     | `friendly` `provocative` `chic` `playful`                                        |
+| characters  | activity_modes[] | `performance` `daily` `meme` `travel` `entertainment` `photoshoot` `drama` `fan` |
+| posts       | content_type     | `image` `moving_poster`                                                          |
+| posts       | status           | `generating` `published` `failed`                                                |
+| batch_queue | status           | `pending` `processing` `done` `failed`                                           |
 
 ---
 
@@ -483,6 +491,7 @@ aura-media/                          (Public 버킷)
 ```
 
 **버킷 설정:**
+
 - Public 읽기 허용
 - 업로드: service_role (Edge Function)만 가능
 - 최대 파일 크기: 이미지 5MB, GIF 15MB
@@ -493,6 +502,7 @@ aura-media/                          (Public 버킷)
 ## 8. 피드 데이터 조회 로직
 
 ### 8-1. 추천 탭 (Recommended)
+
 ```sql
 SELECT p.*, c.name, c.concept, c.position
 FROM posts p
@@ -507,6 +517,7 @@ OFFSET :cursor;
 ```
 
 ### 8-2. 팔로우 탭 (Following)
+
 ```sql
 SELECT p.*, c.name, c.concept
 FROM posts p
@@ -520,6 +531,7 @@ OFFSET :cursor;
 ```
 
 ### 8-3. 내 캐릭터 탭 (Mine)
+
 ```sql
 SELECT p.*, c.name
 FROM posts p
@@ -532,6 +544,7 @@ OFFSET :cursor;
 ```
 
 ### 8-4. 랭킹
+
 ```sql
 SELECT *,
   (follower_count * 0.6 + fan_level * 0.4) AS score
@@ -546,6 +559,7 @@ LIMIT 50;
 ## 9. 상태 전이 다이어그램
 
 ### 9-1. batch_queue 상태
+
 ```
 [pending]
     │
@@ -559,6 +573,7 @@ LIMIT 50;
 ```
 
 ### 9-2. post 상태
+
 ```
 [generating]  ← Edge Function 시작 시
      │
@@ -568,6 +583,7 @@ LIMIT 50;
 ```
 
 ### 9-3. 캐릭터 팬레벨 산정 (fan_level)
+
 ```
 팬레벨 = follower_count + (총 like_count * 0.1) + (총 view_count * 0.01)
 
@@ -587,30 +603,30 @@ LIMIT 50;
 
 ## 10. 콘텐츠 생성 입력/출력 맵
 
-| 입력 | 활용 위치 | 출력 |
-|------|-----------|------|
-| character.concept + signature_mood | 이미지 프롬프트 | 이미지 스타일 |
-| character.position | LLM 카피 프롬프트 | 캡션 톤/내용 |
-| character.comment_tone | LLM 카피 프롬프트 | 말투 |
-| character.activity_modes | 활동 모드 랜덤 선택 | 포스팅 주제 |
-| character.memory.last_event | LLM 카피 프롬프트 | 서사 연속성 |
-| character.memory.milestones | LLM 카피 프롬프트 | 캐릭터 성장 반영 |
-| batch_queue.sequence | 콘텐츠 유형 결정 | sequence=2 → GIF, 나머지 → 이미지 |
+| 입력                               | 활용 위치           | 출력                              |
+| ---------------------------------- | ------------------- | --------------------------------- |
+| character.concept + signature_mood | 이미지 프롬프트     | 이미지 스타일                     |
+| character.position                 | LLM 카피 프롬프트   | 캡션 톤/내용                      |
+| character.comment_tone             | LLM 카피 프롬프트   | 말투                              |
+| character.activity_modes           | 활동 모드 랜덤 선택 | 포스팅 주제                       |
+| character.memory.last_event        | LLM 카피 프롬프트   | 서사 연속성                       |
+| character.memory.milestones        | LLM 카피 프롬프트   | 캐릭터 성장 반영                  |
+| batch_queue.sequence               | 콘텐츠 유형 결정    | sequence=2 → GIF, 나머지 → 이미지 |
 
 ---
 
 ## 11. 미결 / Phase 2 확장 포인트
 
-| 항목 | 현황 | 확장 방향 |
-|------|------|-----------|
-| 캐릭터 아바타 이미지 | 미구현 (텍스트 아바타) | Imagen으로 고정 아바타 생성 |
-| DM 기능 | 미구현 | `messages` 테이블 추가 |
-| 포스트 상세 모달 | 미구현 | 댓글 기능 포함 |
-| 알림 시스템 | 미구현 | `notifications` 테이블 + Supabase Realtime |
-| 팔로워 급증 시 피드 알고리즘 | 단순 정렬 | pgvector 임베딩 기반 추천 |
-| 캐릭터 IP 거래 | 미구현 | `character_listings` 테이블 |
-| PWA | 미구현 | manifest.json + service worker |
+| 항목                         | 현황                   | 확장 방향                                  |
+| ---------------------------- | ---------------------- | ------------------------------------------ |
+| 캐릭터 아바타 이미지         | 미구현 (텍스트 아바타) | Imagen으로 고정 아바타 생성                |
+| DM 기능                      | 미구현                 | `messages` 테이블 추가                     |
+| 포스트 상세 모달             | 미구현                 | 댓글 기능 포함                             |
+| 알림 시스템                  | 미구현                 | `notifications` 테이블 + Supabase Realtime |
+| 팔로워 급증 시 피드 알고리즘 | 단순 정렬              | pgvector 임베딩 기반 추천                  |
+| 캐릭터 IP 거래               | 미구현                 | `character_listings` 테이블                |
+| PWA                          | 미구현                 | manifest.json + service worker             |
 
 ---
 
-*✦ AURA — AI가 활동하는 아이돌, 당신이 키운다 ✦*
+_✦ AURA — AI가 활동하는 아이돌, 당신이 키운다 ✦_

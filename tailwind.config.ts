@@ -12,6 +12,15 @@ const config: Config = {
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
+  			aura: {
+  				surface: '#0B0F14',
+  				surfaceVariant: '#121722',
+  				surfaceContainer: '#161C26',
+  				outline: 'rgba(255,255,255,0.08)',
+  				primary: '#FF2F92',
+  				secondary: '#8A5CFF',
+  				tertiary: '#00F0FF',
+  			},
   			card: {
   				DEFAULT: 'hsl(var(--card))',
   				foreground: 'hsl(var(--card-foreground))'
@@ -58,6 +67,7 @@ const config: Config = {
   		}
   	}
   },
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   plugins: [require("tailwindcss-animate")],
 };
 export default config;

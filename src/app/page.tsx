@@ -1,101 +1,83 @@
+import { getMockPosts, getMockCharacters } from "@/lib/mockData";
 import Image from "next/image";
+import Link from "next/link";
+import { Heart, MessageCircle, Share2 } from "lucide-react";
 
-export default function Home() {
+export default async function FeedPage() {
+  const posts = await getMockPosts(5, 0);
+  const chars = await getMockCharacters(10, 0);
+  
+  // Map char data simply for feed
+  const charMap = new Map(chars.map(c => [c.id, c]));
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <main className="flex flex-col w-full h-[calc(100vh-64px)] bg-aura-surface snap-y snap-mandatory overflow-y-scroll overflow-x-hidden scrollbar-hide relative pb-16">
+      <div className="absolute top-0 w-full z-20 flex px-4">
+        {/* Top Navigation Tabs */}
+        <div className="flex gap-4 items-center flex-1 mt-[16px] overflow-x-auto scrollbar-hide">
+          <button className="h-12 border-b-2 border-aura-primary font-bold text-white whitespace-nowrap px-1">추천</button>
+          <button className="h-12 border-b-2 border-transparent font-medium text-zinc-400 whitespace-nowrap px-1">팔로우</button>
+          <button className="h-12 border-b-2 border-transparent font-medium text-zinc-400 whitespace-nowrap px-1">내 캐릭터</button>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </div>
+
+      {posts.map((post) => {
+        const char = charMap.get(post.character_id);
+        const isVideo = post.content_type === "moving_poster";
+        return (
+          <div key={post.id} className="relative w-full h-[100dvh] snap-start snap-always bg-aura-surface shrink-0">
+            {isVideo ? (
+              <video src={post.media_url} autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-90" />
+            ) : (
+              <Image src={post.media_url || post.media_thumb_url || "/default-avatar.png"} alt={post.caption} fill className="object-cover opacity-90" />
+            )}
+            
+            {/* Overlay Gradient */}
+            <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-[#0B0F14] via-[#0B0F14]/60 to-transparent pointer-events-none" />
+
+            {/* Right Action Bar - 56dp width zone */}
+            <div className="absolute right-0 bottom-[calc(24px+4rem)] w-[56px] flex flex-col gap-4 items-center z-10 mr-2">
+              <Link href={`/character/${post.character_id}`}>
+                <div className="w-12 h-12 rounded-full border-2 border-aura-primary overflow-hidden relative shadow-lg shadow-aura-primary/20 mb-2">
+                  <Image src={char?.avatar_url || "/default-avatar.png"} alt={char?.name || "Char"} fill className="object-cover" />
+                </div>
+              </Link>
+              <div className="flex flex-col items-center gap-1 group">
+                <div className="w-12 h-12 flex items-center justify-center bg-transparent text-white cursor-pointer hover:bg-white/10 rounded-full transition-colors">
+                  <Heart size={24} className="text-white group-hover:text-aura-primary transition-colors" />
+                </div>
+                <span className="text-xs font-semibold text-white">{post.like_count}</span>
+              </div>
+              <div className="flex flex-col items-center gap-1 group">
+                <div className="w-12 h-12 flex items-center justify-center bg-transparent text-white cursor-pointer hover:bg-white/10 rounded-full transition-colors">
+                  <MessageCircle size={24} />
+                </div>
+                <span className="text-xs font-semibold text-white">{Math.floor(post.like_count / 10)}</span>
+              </div>
+              <div className="flex flex-col items-center gap-1 group">
+                <div className="w-12 h-12 flex items-center justify-center bg-transparent text-white cursor-pointer hover:bg-white/10 rounded-full transition-colors">
+                  <Share2 size={24} />
+                </div>
+                <span className="text-xs font-semibold text-white">{post.share_count}</span>
+              </div>
+            </div>
+
+            {/* Bottom Info Container (padding 16dp) */}
+            <div className="absolute left-0 bottom-[calc(24px+4rem)] right-[72px] p-4 text-white z-10 flex flex-col justify-end">
+              <Link href={`/character/${post.character_id}`}>
+                <h2 className="text-[16px] font-bold flex items-center gap-2 hover:text-aura-primary transition-colors drop-shadow-md">
+                  {char?.name || "Unknown"}
+                  <span className="text-[10px] border border-aura-tertiary text-aura-tertiary px-1.5 py-0.5 rounded-full font-medium uppercase tracking-wider">{post.activity_mode}</span>
+                </h2>
+              </Link>
+              <p className="text-[14px] mt-2 line-clamp-2 opacity-90 leading-relaxed drop-shadow-md">
+                {post.caption}
+              </p>
+            </div>
+            
+          </div>
+        );
+      })}
+    </main>
   );
 }

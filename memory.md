@@ -42,6 +42,6 @@
 ### 에이전트 인계 지침
 
 - 새로운 세션 시작 시 **우선적으로 이 파일(`memory.md`)과 `todo.md`를 열람**하여 이전 작업 현황을 파악하고 맥락(context)을 이어간다.
-- Next.js 실행 포트는 항상 `8000`번이다.
+- Next.js 실행 포트는 항상 `3000`번이다.
 - Agent.md, GEMINI.md, `.cursor/rules` 등 에이전트 및 서비스 정책에 관련된 파일 규칙을 준수한다.
 - 서버 API 변경 시 `docs/openapi.yaml`, `todo.md`, `memory.md`를 함께 갱신한다.

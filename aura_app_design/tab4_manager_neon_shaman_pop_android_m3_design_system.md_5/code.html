@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AURA - Manager Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        :root {
+            --md-sys-color-surface: #0B0F14;
+            --md-sys-color-surface-variant: #121722;
+            --md-sys-color-surface-container: #161C26;
+            --md-sys-color-on-surface: #E6E1E5;
+            --md-sys-color-on-surface-variant: #CAC4D0;
+            --md-sys-color-primary: #FF2F92;--md-sys-color-secondary: #8A5CFF;--md-sys-color-tertiary: #00F0FF;--md-sys-color-outline: rgba(255, 255, 255, 0.08);
+        }
+        body {
+            background-color: var(--md-sys-color-surface);
+            color: var(--md-sys-color-on-surface);
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }.text-neon-pink { color: var(--md-sys-color-primary); }
+        .text-neon-violet { color: var(--md-sys-color-secondary); }
+        .text-neon-cyan { color: var(--md-sys-color-tertiary); }
+        .bg-neon-pink { background-color: var(--md-sys-color-primary); }
+        .bg-neon-violet { background-color: var(--md-sys-color-secondary); }
+        .bg-neon-cyan { background-color: var(--md-sys-color-tertiary); }
+        .border-neon-pink { border-color: var(--md-sys-color-primary); }
+        .border-neon-cyan { border-color: var(--md-sys-color-tertiary); }.surface-container {
+            background-color: var(--md-sys-color-surface-container);
+            border-radius: 16px;}
+        .surface-variant {
+            background-color: var(--md-sys-color-surface-variant);
+        }.glow-pink {
+            box-shadow: 0 0 8px rgba(255, 47, 146, 0.4);
+        }
+        .glow-cyan-text {
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+        }.no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="h-screen w-full overflow-hidden flex flex-col relative">
+<header class="flex items-center justify-between px-4 py-3 bg-[var(--md-sys-color-surface)] z-10">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[var(--md-sys-color-on-surface)]">menu</span>
+<h1 class="text-xl font-semibold tracking-tight">Manager Dashboard</h1>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-[var(--md-sys-color-outline)]">
+<img alt="User" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3eJ9qf2q-B_T9CbDJld4nAa1PeRyYBlf-mN0ca3zwe5VDZtfAVmy9KN8pXAACmfEMXyMl35aKV5BA-w4iV3seB4WW9SuL2uRXStbq6g-XM0PRUv8JWuktGIjqtpZ65hl_fCJWtxoOlB0qyAXfDNYonWNmcer83N0riD4CNvSt7SxjDuNr3zIubbB9vGt4b3AT3ugsnz28dDgMmiKnEbGnrFcoUpVZXPRtBLgh8mKcMgser2q8Nyl1E3jy6xekq2TB5eOKvXMl3XDd"/>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto no-scrollbar pb-6 px-4">
+<section class="mt-6 mb-8">
+<div class="flex justify-between items-center mb-4">
+<h2 class="text-lg font-medium text-[var(--md-sys-color-on-surface)]">Managed Idols</h2>
+<button class="text-sm font-medium text-neon-pink flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">add</span> Create New
+                </button>
+</div>
+<div class="flex flex-col gap-4">
+<article class="surface-container p-4 relative overflow-hidden group">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-neon-pink"></div>
+<div class="flex gap-4">
+<div class="w-16 h-16 rounded-full overflow-hidden border-2 border-neon-pink shadow-lg shrink-0 relative">
+<img alt="Idol" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhH3xJ1LUswaaURHwRelWuqa1HKCfc_I1yhATORTKe2ZJctinxQTC7lFiatasr7dX_toDbR9fizNvM4i9Y7Un9xnlnXzRGEwBdQRBASdPUf8MsGGbyS_TuUbzZzdcsoJFE_XK9X6p_sg6qKTczHbqjCVgwfFjOibzIJ9itPEPa83HjrDgwM4zzd2jGYCkBn-sMdXahA_G9kRijoxwXhh9ttg4Srz2NH4EIKj9r1z_kCt_DDEUBuykGMvhjSVgJYfGIosJBb5VGPKCk"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="text-lg font-semibold text-[var(--md-sys-color-on-surface)] truncate">Luna Eclipse</h3>
+<p class="text-xs text-[var(--md-sys-color-on-surface-variant)] mt-0.5">Main Vocal • Electronic Shaman</p>
+</div>
+<span class="bg-neon-pink/10 text-neon-pink text-xs font-medium px-2.5 py-1 rounded-full border border-neon-pink/20">
+                                    Lv. 12
+                                </span>
+</div>
+<div class="mt-4">
+<div class="flex justify-between text-xs mb-1.5">
+<span class="text-[var(--md-sys-color-on-surface-variant)]">Daily Auto-Post Schedule</span>
+<span class="text-neon-cyan font-medium">3/4 Completed</span>
+</div>
+<div class="h-1.5 w-full bg-[var(--md-sys-color-surface-variant)] rounded-full overflow-hidden">
+<div class="h-full bg-neon-cyan w-3/4 rounded-full glow-cyan-text"></div>
+</div>
+</div>
+</div>
+</div>
+</article>
+<article class="surface-container p-4 relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-[var(--md-sys-color-secondary)]"></div>
+<div class="flex gap-4">
+<div class="w-16 h-16 rounded-full overflow-hidden border-2 border-[var(--md-sys-color-secondary)] shadow-lg shrink-0">
+<img alt="Idol" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzZ1_BYjU8lHP5aFEeAL2n1imIcMWNjHr-V-lnGUgzpd3-r9bFhUri4WDQTjsNIWQckfodO4tAxrGQSM2BMbkQ3ULzCpDFajRd8pNn6Vi89xNjTUh0bEQdPCd4MRN_dFSiGm_Ou--fn6FjyljERsQn7KDNLSunOu7hDjeGd00tFYQ3_mqDkToFA3-cTDTl0nbQjmPCwW0Rym6TbGmNq0aBnLqmfM-5ADZKMPZIZGdis1wZmTduRx16GL-w254vuEqjsWmCcjTs85WT"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="text-lg font-semibold text-[var(--md-sys-color-on-surface)] truncate">Sola Flare</h3>
+<p class="text-xs text-[var(--md-sys-color-on-surface-variant)] mt-0.5">Lead Dancer • Fire Spirit</p>
+</div>
+<span class="bg-[var(--md-sys-color-secondary)]/10 text-neon-violet text-xs font-medium px-2.5 py-1 rounded-full border border-[var(--md-sys-color-secondary)]/20">
+                                    Lv. 8
+                                </span>
+</div>
+<div class="mt-4">
+<div class="flex justify-between text-xs mb-1.5">
+<span class="text-[var(--md-sys-color-on-surface-variant)]">Daily Auto-Post Schedule</span>
+<span class="text-[var(--md-sys-color-on-surface-variant)]">0/3 Started</span>
+</div>
+<div class="h-1.5 w-full bg-[var(--md-sys-color-surface-variant)] rounded-full overflow-hidden">
+<div class="h-full bg-[var(--md-sys-color-on-surface-variant)] w-0 rounded-full opacity-30"></div>
+</div>
+</div>
+</div>
+</div>
+</article>
+</div>
+</section>
+<section>
+<div class="flex justify-between items-center mb-4">
+<h2 class="text-lg font-medium text-[var(--md-sys-color-on-surface)]">Memory Timeline</h2>
+<button class="text-sm text-[var(--md-sys-color-on-surface-variant)] flex items-center">
+                    View All <span class="material-symbols-outlined text-[16px] ml-1">chevron_right</span>
+</button>
+</div>
+<div class="relative pl-2">
+<div class="absolute left-[19px] top-2 bottom-4 w-[2px] bg-[var(--md-sys-color-outline)]"></div>
+<div class="flex gap-4 mb-6 relative">
+<div class="z-10 mt-1 flex-shrink-0 w-9 h-9 rounded-full bg-neon-pink flex items-center justify-center shadow-[0_0_12px_rgba(255,47,146,0.5)]">
+<span class="material-symbols-outlined text-white text-[20px]">star</span>
+</div>
+<div class="surface-container p-4 flex-1">
+<div class="flex justify-between items-start mb-1">
+<span class="text-xs text-neon-pink font-bold uppercase tracking-wider">Milestone</span>
+<span class="text-xs text-[var(--md-sys-color-on-surface-variant)]">2h ago</span>
+</div>
+<h4 class="text-base font-semibold mb-1">Debut Stage Success</h4>
+<p class="text-sm text-[var(--md-sys-color-on-surface-variant)] leading-snug">
+                            Luna Eclipse's debut video reached 10k views in the first hour. Fan sentiment is overwhelmingly positive.
+                        </p>
+</div>
+</div>
+<div class="flex gap-4 mb-6 relative">
+<div class="z-10 mt-1 flex-shrink-0 w-9 h-9 rounded-full bg-[var(--md-sys-color-surface-variant)] border border-[var(--md-sys-color-secondary)] flex items-center justify-center">
+<span class="material-symbols-outlined text-neon-violet text-[20px]">forum</span>
+</div>
+<div class="surface-container p-4 flex-1">
+<div class="flex justify-between items-start mb-1">
+<span class="text-xs text-neon-violet font-bold uppercase tracking-wider">Interaction</span>
+<span class="text-xs text-[var(--md-sys-color-on-surface-variant)]">5h ago</span>
+</div>
+<h4 class="text-base font-semibold mb-1">Viral Reply</h4>
+<p class="text-sm text-[var(--md-sys-color-on-surface-variant)] leading-snug">
+                            Sola Flare's automated reply to @fan_user123 generated high engagement.
+                        </p>
+</div>
+</div>
+<div class="flex gap-4 mb-2 relative">
+<div class="z-10 mt-1 flex-shrink-0 w-9 h-9 rounded-full bg-[var(--md-sys-color-surface-variant)] border border-neon-cyan flex items-center justify-center">
+<span class="material-symbols-outlined text-neon-cyan text-[20px]">schedule</span>
+</div>
+<div class="surface-container p-4 flex-1">
+<div class="flex justify-between items-start mb-1">
+<span class="text-xs text-neon-cyan font-bold uppercase tracking-wider">System</span>
+<span class="text-xs text-[var(--md-sys-color-on-surface-variant)]">Yesterday</span>
+</div>
+<h4 class="text-base font-semibold mb-1">Schedule Updated</h4>
+<p class="text-sm text-[var(--md-sys-color-on-surface-variant)] leading-snug">
+                            Weekly content plan for all idols has been regenerated based on trending topics.
+                        </p>
+</div>
+</div>
+</div>
+</section>
+<div class="h-8"></div>
+</main>
+<button class="absolute bottom-6 right-6 h-14 w-14 rounded-[16px] bg-neon-pink text-white shadow-lg flex items-center justify-center glow-pink z-50 transition-transform active:scale-95">
+<span class="material-symbols-outlined text-[28px]">add</span>
+</button>
+
+</body></html>

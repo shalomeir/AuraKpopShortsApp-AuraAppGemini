@@ -28,11 +28,11 @@ async function getMockVideoUrl(index: number): Promise<string> {
     }
   }
   
-  // Fallback (Pexels에서 무작위 추출된 세로형 댄스/패션 무료 영상 링크)
+  // Fallback (공개 무료 샘플 비디오 링크)
   const fallbacks = [
-    'https://videos.pexels.com/video-files/5423853/5423853-uhd_2160_4096_30fps.mp4',
-    'https://videos.pexels.com/video-files/4255556/4255556-uhd_2160_4096_24fps.mp4',
-    'https://videos.pexels.com/video-files/4032731/4032731-uhd_2160_4096_24fps.mp4'
+    'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
+    'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4'
   ];
   return fallbacks[index % fallbacks.length];
 }
@@ -57,10 +57,11 @@ async function getMockImageUrl(index: number, type: 'avatar' | 'post'): Promise<
     }
   }
   
-  // Fallback (API 키 없을 때 source.unsplash.com 사용)
-  const size = type === 'avatar' ? '200x200' : '400x600';
-  const queryFallback = type === 'avatar' ? 'korean,portrait' : 'kpop,idol';
-  return `https://source.unsplash.com/${size}/?${queryFallback},${index}`;
+  // Fallback (API 키 없을 때 loremflickr 사용)
+  const width = type === 'avatar' ? 200 : 400;
+  const height = type === 'avatar' ? 200 : 600;
+  const keyword = type === 'avatar' ? 'face,portrait' : 'kpop,dance';
+  return `https://loremflickr.com/${width}/${height}/${keyword}?random=${index}`;
 }
 
 // 1. 캐릭터 목록 Mock (DummyJSON Users 활용)
@@ -85,7 +86,7 @@ export async function getMockCharacters(limit = 10, skip = 0): Promise<Character
       const firstName = String(user.firstName || '');
       const lastName = String(user.lastName || '');
 
-      const avatarUrl = await getMockImageUrl(idNum, 'avatar');
+      const avatarUrl = String(user.image || '') || await getMockImageUrl(idNum, 'avatar');
 
       return {
         id: `char_${idStr}`,
@@ -142,7 +143,7 @@ export async function getMockPosts(limit = 10, skip = 0): Promise<Post[]> {
 
       const isVideo = idNum % 3 === 0;
       let mediaUrl = await getMockImageUrl(index, 'post');
-      const mediaThumbUrl = `https://source.unsplash.com/200x300/?kpop,idol,${idStr}`;
+      const mediaThumbUrl = `https://loremflickr.com/200/300/kpop?random=${idStr}`;
       
       if (isVideo) {
          mediaUrl = await getMockVideoUrl(index);
@@ -150,7 +151,7 @@ export async function getMockPosts(limit = 10, skip = 0): Promise<Post[]> {
 
       return {
         id: `post_${idStr}`,
-        character_id: `char_${post.userId}`, // DummyJSON의 userId를 Character ID에 매핑
+        character_id: `char_${((Number(post.userId) - 1) % 10) + 1}`, // Feed와 매칭되도록 1~10 캐릭터 ID로 한정 매핑
         content_type: isVideo ? 'moving_poster' : 'image', // 1/3 확률로 무빙포스터
         caption: String(post.body || '').slice(0, 100) + '... #' + (tags[0] || 'KPOP'), 
         // 9:16 비율 (세로 숏폼 포맷 모방)을 위해 Unsplash (또는 Pexels) 사용

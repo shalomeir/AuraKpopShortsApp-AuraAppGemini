@@ -20,13 +20,16 @@ npm ci
 
 1. `.env.example`를 기준으로 `.env.local` 작성
 2. 필수 값 입력
+
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `NEXT_PUBLIC_APP_URL`
+
 3. Supabase OAuth Redirect URL 등록
+
 - `https://<your-domain>/auth/callback`
-- 로컬 개발 시 `http://localhost:8000/auth/callback`
+- 로컬 개발 시 `http://localhost:3000/auth/callback`
 
 ## Run
 
@@ -34,7 +37,7 @@ npm ci
 npm run dev
 ```
 
-기본 개발 포트는 `8000`입니다.
+기본 개발 포트는 `3000`입니다.
 
 ## Database Migration
 
@@ -60,19 +63,27 @@ OpenAPI 문서:
 ## Deploy (Vercel + Git Push)
 
 1. GitHub 원격 저장소 연결 확인
+
 ```bash
 git remote -v
 ```
+
 2. Vercel 프로젝트 연결(최초 1회)
+
 ```bash
 npx vercel link
 ```
+
 3. Vercel 환경변수 등록
+
 - Vercel Dashboard > Project > Settings > Environment Variables
 - `.env.local`의 서버/클라이언트 키를 동일하게 등록
+
 4. 배포
+
 - Git 연동 시: `main` 브랜치 `git push` 시 자동 배포
 - 수동 배포 시:
+
 ```bash
 npx vercel --prod
 ```
@@ -80,4 +91,3 @@ npx vercel --prod
 ## License
 
 개인/내부 개발용. 별도 라이선스가 필요하면 `LICENSE` 파일을 추가해 명시하세요.
-

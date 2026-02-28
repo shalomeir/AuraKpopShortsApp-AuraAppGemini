@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AURA - Top Idol Leaderboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        :root {
+            --surface: #0B0F14;
+            --surface-variant: #121722;
+            --surface-container: #161C26;
+            --primary-neon: #FF2F92;
+            --secondary-neon: #8A5CFF;
+            --tertiary-neon: #00F0FF;
+            --outline: rgba(255,255,255,0.08);
+            --text-primary: #E2E2E6;
+            --text-secondary: #C4C7C5;
+        }
+        body {
+            background-color: var(--surface);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+        }.no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }.neon-text-glow {
+            text-shadow: 0 0 8px rgba(138, 92, 255, 0.5);
+        }
+        .talisman-glow-1 {
+            box-shadow: 0 0 15px rgba(255, 47, 146, 0.6), inset 0 0 10px rgba(255, 47, 146, 0.3);
+            border: 1px solid rgba(255, 47, 146, 0.8);
+        }
+        .talisman-glow-2 {
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.5), inset 0 0 10px rgba(0, 240, 255, 0.2);
+            border: 1px solid rgba(0, 240, 255, 0.8);
+        }
+        .talisman-glow-3 {
+            box-shadow: 0 0 15px rgba(138, 92, 255, 0.5), inset 0 0 10px rgba(138, 92, 255, 0.2);
+            border: 1px solid rgba(138, 92, 255, 0.8);
+        }.avatar-shaman {
+            position: relative;
+        }
+        .avatar-shaman::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-neon), var(--secondary-neon));
+            z-index: -1;
+            opacity: 0.7;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="h-screen flex flex-col overflow-hidden antialiased">
+<header class="flex items-center justify-between px-4 py-3 bg-[var(--surface)] z-10 sticky top-0">
+<button class="w-12 h-12 flex items-center justify-center rounded-full active:bg-[var(--surface-variant)] transition-colors">
+<span class="material-symbols-outlined text-[var(--text-primary)]">arrow_back</span>
+</button>
+<h1 class="text-lg font-semibold tracking-wide">Leaderboard</h1>
+<button class="w-12 h-12 flex items-center justify-center rounded-full active:bg-[var(--surface-variant)] transition-colors">
+<span class="material-symbols-outlined text-[var(--text-primary)]">tune</span>
+</button>
+</header>
+<main class="flex-1 overflow-y-auto no-scrollbar pb-6">
+<div class="pt-6 pb-10 px-4">
+<div class="flex items-end justify-center gap-4 max-w-sm mx-auto">
+<div class="flex flex-col items-center w-1/3 order-1">
+<div class="relative mb-3">
+<div class="avatar-shaman w-20 h-20 rounded-full p-[2px]">
+<img alt="Idol 2" class="w-full h-full object-cover rounded-full bg-[var(--surface-container)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtzxhc6ldSL94PkfCixyORFHhU2QCAwIpO-RIXVkVuP6C0gmCqHQshEuov3JxbtH13SgTfrDduqdhjq7i3bjMYJHmjEk3e3jFRG587NXDeaFqd0OFo5CHU9yNjbwY2LVIXzA2ZOGQEF7tMho69PvLcWqnXqXQWGXAtXAz4lnP0lLVkBPkBajkC6NKsry7CBTStj0mE2gfDx2gfCd-T9MZaGaJtXQeL-1GHqdt3L826I5lHKs2hQprPUddhGTEMgxUN1pyjTW5Y2T95"/>
+</div>
+<div class="absolute -bottom-3 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-[var(--surface-variant)] talisman-glow-2 flex items-center justify-center rotate-45">
+<span class="text-[var(--tertiary-neon)] font-bold text-sm -rotate-45">2</span>
+</div>
+</div>
+<h3 class="font-semibold text-sm truncate w-full text-center mt-2">Luna</h3>
+<p class="text-xs text-[var(--text-secondary)]">2.4M Aura</p>
+</div>
+<div class="flex flex-col items-center w-1/3 order-2 -mt-8 relative z-10">
+<span class="material-symbols-outlined text-[var(--primary-neon)] mb-1 text-3xl neon-text-glow">crown</span>
+<div class="relative mb-3">
+<div class="avatar-shaman w-24 h-24 rounded-full p-[3px] shadow-[0_0_20px_rgba(255,47,146,0.3)]">
+<img alt="Idol 1" class="w-full h-full object-cover rounded-full bg-[var(--surface-container)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUcUsqk7zX2VrqTUDLYadeO9LAlEOiob3b-FgZMN1HENuSEErj5LRZ83C1ZeVSXIoB4e5YkZ1fWEOif04PdRBdWAHvE0eSgnr-qQZKHzLrshns9-n6s3r6dYaRkEmvo08BxQKop44lz8izy1SNsdS19Y5lXC-ygSeNhfeEUJzI6kKlh5N8rMkCzYImq84tJt48ZcEdArL44KcWeFOhPktiJut3g8EAKvHP3TeA0qAXyxGlNEdSdeL7OdUTPpnESesxboiaRSLPp_FO"/>
+</div>
+<div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-[var(--surface-variant)] talisman-glow-1 flex items-center justify-center rotate-45">
+<span class="text-[var(--primary-neon)] font-bold text-lg -rotate-45">1</span>
+</div>
+</div>
+<h3 class="font-bold text-base truncate w-full text-center mt-3 text-[var(--primary-neon)]">K-AI</h3>
+<p class="text-xs text-[var(--text-secondary)] font-medium">3.1M Aura</p>
+</div>
+<div class="flex flex-col items-center w-1/3 order-3">
+<div class="relative mb-3">
+<div class="avatar-shaman w-20 h-20 rounded-full p-[2px]">
+<img alt="Idol 3" class="w-full h-full object-cover rounded-full bg-[var(--surface-container)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKS8PmVJ7EdlcTEttDyQa0i7QHjJ66i2ThoAE9_n2apUFXQ-NUL9GbJkYJo5pBXJ5MTW-fSCNndiKuA53WbJIb1fGJoEagaq67vmtmq6Z5obIdEvu_Xz3taPudQ0JOkbYNsYH7RmY82EaGXQLcqJL7YdiPU7kAUZp_QB0qdH61nedTUY39ZF5kh8MbNB-MEntkwJWLMQbH219br1PrNE3A84uxVYHpLU9-XdGL1fONb7I2j1B899kRjs9D0r5rXSBf8tFGh_fhqp7Z"/>
+</div>
+<div class="absolute -bottom-3 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-[var(--surface-variant)] talisman-glow-3 flex items-center justify-center rotate-45">
+<span class="text-[var(--secondary-neon)] font-bold text-sm -rotate-45">3</span>
+</div>
+</div>
+<h3 class="font-semibold text-sm truncate w-full text-center mt-2">Nyx</h3>
+<p class="text-xs text-[var(--text-secondary)]">1.9M Aura</p>
+</div>
+</div>
+</div>
+<div class="bg-[var(--surface-container)] rounded-t-[24px] min-h-full px-2 pt-4">
+<div class="flex items-center justify-between px-4 py-2 mb-2 text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider">
+<span>Rank</span>
+<span class="mr-8">Idol</span>
+<span>Aura Pts</span>
+</div>
+<div class="space-y-1">
+<div class="flex items-center h-[72px] px-4 rounded-[16px] active:bg-[rgba(255,255,255,0.03)] transition-colors">
+<span class="w-8 text-center font-bold text-[var(--text-secondary)] text-sm">4</span>
+<div class="relative w-12 h-12 mx-4">
+<img alt="Avatar" class="w-full h-full rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0CErgTVwvKrHcUolNTXGXm6LwPhmko9KAnkK8ysXSJvnng-paPlzPm7ITbywX9Gc55hOzDZ2ZmmsercmkONbuJyDs0noN1xuuU0mWgSdRqHqRMreEHp72qp4ShZvsP8KV-1dVTh06mgEfs46jjJo1DQyAU44trR6XPDVua91niPQc5-8HvJcaS1Ib42gjrUkKsLJ_qVAilx4fZe8IhtxvHZKX9iXdCzVwKPF7pg4xLoQGN5Z80FTASLUHzMha3g8tfSgE6P2w9_Mn"/>
+</div>
+<div class="flex-1 flex flex-col justify-center">
+<span class="text-[var(--text-primary)] font-medium text-base">Sora</span>
+<div class="flex items-center gap-1 text-xs text-[var(--text-secondary)]">
+<span class="w-1.5 h-1.5 rounded-full bg-[var(--secondary-neon)]"></span>
+<span>Rising Star</span>
+</div>
+</div>
+<span class="font-semibold text-[var(--text-primary)]">1.2M</span>
+</div>
+<div class="flex items-center h-[72px] px-4 rounded-[16px] active:bg-[rgba(255,255,255,0.03)] transition-colors">
+<span class="w-8 text-center font-bold text-[var(--text-secondary)] text-sm">5</span>
+<div class="relative w-12 h-12 mx-4">
+<img alt="Avatar" class="w-full h-full rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQ2eNM98Sxu2EmUTJkrNBL_iRIf5mDN2fKHYSWpHS1s7ysXa5nERS2eOG-fUKfaCPHNNInaBeuirfliZqnonXJIIGrk9ASoBB_rn5crvCgFdYARiXX6yELBzQoNIczRnNpwnpUyYudER6BBFohI5GO6hKaULKOfHitOlXUW10PVpOXwSu0sMtTSwjbG0oDBnSgr4btzKgEO_UtuDMfFlcPltK7K20DLjhC_ZjK9965K2Udg50xHgl3ArCJBGzQ4QWzlV3ZVu0dY-wC"/>
+</div>
+<div class="flex-1 flex flex-col justify-center">
+<span class="text-[var(--text-primary)] font-medium text-base">Ryu</span>
+<div class="flex items-center gap-1 text-xs text-[var(--text-secondary)]">
+<span class="w-1.5 h-1.5 rounded-full bg-gray-500"></span>
+<span>Stable</span>
+</div>
+</div>
+<span class="font-semibold text-[var(--text-primary)]">980K</span>
+</div>
+<div class="flex items-center h-[72px] px-4 rounded-[16px] active:bg-[rgba(255,255,255,0.03)] transition-colors">
+<span class="w-8 text-center font-bold text-[var(--text-secondary)] text-sm">6</span>
+<div class="relative w-12 h-12 mx-4">
+<img alt="Avatar" class="w-full h-full rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwfa4nQuoCNx_Q7dc7jyFV_7VJoI4-SD7jK74nG2Dh6Tt4uPrIvDjzEDQBVec3k9sEf76hCEy5hQ2pFT0P8Fri-sLUZUNjpBlgEqjrrir1CChnfWJcCw2XFO5TGcB_fOLR9qjHsO4VZ9tgygvhJ3Btp4GzLAuClbT240t7Mtfuk8pjjn2JgMnW8PpEkVeTryLKTc8J73ebBORD61JBv84nG92k6EVeSUD17S3DpREYCaIA6KjqEa9ePj7WYgox4JWYDByo1wWwWVnr"/>
+</div>
+<div class="flex-1 flex flex-col justify-center">
+<span class="text-[var(--text-primary)] font-medium text-base">Vesper</span>
+<div class="flex items-center gap-1 text-xs text-[var(--text-secondary)]">
+<span class="material-symbols-outlined text-[10px] text-[var(--primary-neon)]">arrow_upward</span>
+<span class="text-[var(--primary-neon)]">Trending</span>
+</div>
+</div>
+<span class="font-semibold text-[var(--text-primary)]">850K</span>
+</div>
+<div class="flex items-center h-[72px] px-4 rounded-[16px] active:bg-[rgba(255,255,255,0.03)] transition-colors">
+<span class="w-8 text-center font-bold text-[var(--text-secondary)] text-sm">7</span>
+<div class="relative w-12 h-12 mx-4">
+<img alt="Avatar" class="w-full h-full rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsSDVoxpIRpLcXVxoJNrkgGWZ1eQIpkJOgsLs_F2vvYoSS0aBMIZ_9F2vw90lhwJIC1eSVgMPiHmpb4LCNbGsAKfikjpD1l9_VolWTovDQUi_mxQLqiuIZKr87w81yCHwEYWvC-88BJJwwHfXSa4GTGeb7ktkxUICQpGsgDC3X4KB_1E8DcP8Is_fgBSuEES_aoyOoBVQIs-NsMQBUHE-CwqhwF_w9itmQKOALsVGHcSnbSyNfrrN9e3-oHMcPoNq34ZrIZ9uYwgUg"/>
+</div>
+<div class="flex-1 flex flex-col justify-center">
+<span class="text-[var(--text-primary)] font-medium text-base">Echo</span>
+<div class="flex items-center gap-1 text-xs text-[var(--text-secondary)]">
+<span class="w-1.5 h-1.5 rounded-full bg-gray-500"></span>
+<span>Stable</span>
+</div>
+</div>
+<span class="font-semibold text-[var(--text-primary)]">720K</span>
+</div>
+<div class="flex items-center h-[72px] px-4 rounded-[16px] active:bg-[rgba(255,255,255,0.03)] transition-colors">
+<span class="w-8 text-center font-bold text-[var(--text-secondary)] text-sm">8</span>
+<div class="relative w-12 h-12 mx-4">
+<img alt="Avatar" class="w-full h-full rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuO4SvsF2cjapH3EkZpWf-xKDLnwSfpQVqtGpQdskczN61aTVttfDoViqZfnpnUnbyv1JWI2vIrx_TExvJv2-KnX02KNHjp9W95FOroPsP5_J4HLrYSHCti9yq802Z07s2cKPs4KHwjEYSiWxdFzIuP16D0f7MZJIT2AbSlqLcVeo6a-R9L7uwQWaQ_TvpHSmk2b9iTKsGHstftNkSx5PkNTYpT4tXvTIhblMniGwpUDSbf2F6ECcN7T_ZRxtc51u9Lb3iLzsXP5uL"/>
+</div>
+<div class="flex-1 flex flex-col justify-center">
+<span class="text-[var(--text-primary)] font-medium text-base">Nova</span>
+<div class="flex items-center gap-1 text-xs text-[var(--text-secondary)]">
+<span class="material-symbols-outlined text-[10px] text-red-500">arrow_downward</span>
+<span class="text-red-400">Falling</span>
+</div>
+</div>
+<span class="font-semibold text-[var(--text-primary)]">640K</span>
+</div>
+</div>
+<div class="h-8"></div>
+</div>
+</main>
+
+</body></html>

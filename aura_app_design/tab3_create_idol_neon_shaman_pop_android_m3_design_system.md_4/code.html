@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AURA - Summon New AI Idol</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        :root {--surface: #0B0F14;
+            --surface-variant: #121722;
+            --surface-container: #161C26;
+            --outline: rgba(255,255,255,0.12);
+            --on-surface: #E2E2E6;
+            --on-surface-variant: #C4C7C5;--primary-neon: #FF2F92;
+            --secondary-neon: #8A5CFF;
+            --tertiary-neon: #00F0FF;
+        }
+        body {
+            background-color: var(--surface);
+            color: var(--on-surface);
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }.m3-card {
+            background-color: var(--surface-container);
+            border-radius: 16px;box-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 1px 3px 1px rgba(0,0,0,0.15); 
+        }.m3-chip {
+            height: 40px;border-radius: 12px;border: 1px solid var(--outline);
+            background-color: transparent;
+            transition: all 0.2s cubic-bezier(0.2, 0.0, 0, 1.0);
+        }
+        .m3-chip.selected {
+            background-color: rgba(138, 92, 255, 0.15);border-color: var(--secondary-neon);
+            color: var(--secondary-neon);
+            box-shadow: 0 0 8px rgba(138, 92, 255, 0.2);
+        }.btn-primary-neon {
+            background-color: var(--primary-neon);
+            color: #FFFFFF;
+            height: 48px;
+            border-radius: 24px;font-weight: 600;
+            box-shadow: 0 4px 12px rgba(255, 47, 146, 0.3);
+            transition: transform 0.1s ease, box-shadow 0.2s ease;
+        }
+        .btn-primary-neon:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 6px rgba(255, 47, 146, 0.2);
+        }.m3-input-container {
+            background-color: var(--surface-variant);
+            border-radius: 4px 4px 0 0;
+            border-bottom: 1px solid var(--outline);
+        }
+        .m3-input-container:focus-within {
+            border-bottom: 2px solid var(--tertiary-neon);
+        }.no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="flex justify-center min-h-screen">
+<div class="w-full max-w-md h-screen relative flex flex-col overflow-hidden bg-[#0B0F14]">
+<header class="flex items-center justify-between px-4 pt-6 pb-4 shrink-0 z-10">
+<button class="w-12 h-12 flex items-center justify-center rounded-full text-[var(--on-surface)] active:bg-white/5">
+<span class="material-symbols-outlined text-2xl">arrow_back</span>
+</button>
+<h1 class="text-lg font-medium tracking-wide">Summon Idol</h1>
+<div class="w-12 h-12"></div> 
+</header>
+<main class="flex-1 overflow-y-auto no-scrollbar px-4 pb-24">
+<div class="flex flex-col items-center mb-6">
+<div class="relative w-24 h-24 mb-4">
+<div class="absolute inset-0 bg-gradient-to-tr from-[var(--secondary-neon)] to-[var(--tertiary-neon)] rounded-full blur-xl opacity-20"></div>
+<img alt="placeholder" class="w-full h-full object-contain p-2 opacity-0 absolute" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1Znshw7wzFrKuZg6s_JJ8e47K1E-zOEcJAViXdme1qxOgz36hIpH5RVMNxE3re_mQ7V8pFpAcP0jl_4I9gEX6ExFkoWwezYz8OBHzcyVyOinTJwT9pcY5Jt_gs6I2NkcE3YMo2Upx6iE2QwgrqpsU_c4IDVT03sk9pFs8655wxqGHLQ0dm5ehcgoVGpgMl3YUUy0dqVkQN5vaRCvlrRWkW_bYcjcRbqPR7OwY_xToA8D9WveE7hNKe2vX6BWG7EMUqZQnbZJeSH8W"/>
+<div class="w-full h-full flex items-center justify-center">
+<img alt="AURA Logo" class="w-20 h-20 object-contain drop-shadow-[0_0_15px_rgba(138,92,255,0.5)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPL_hR04-kkmp9eH77YRu90Okl6LJFml2I7yc_ld28KSM21N40FWaeEavqefp16WbDnodfpYHFs5felzsM0dbYYiVzyRLN3i8cjVVls_ITx0rb8t0u-stAB8GeHeAQMzU-hr7BlflbYectC0gfQnceC9qB2RLmppcTmz78jkKqOW72z7ntbHVDssd839bDp5be_CFG1WCE8E2bGCNYUZKYQsocJFkggxWrA9SSGfBdbU8GwiRWVOknJ2DrN-Yf0W1ZCD_Gg57838gY"/>
+</div>
+</div>
+<h2 class="text-2xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-gray-400">
+                    Manifest Your Star
+                </h2>
+<p class="text-sm text-[var(--on-surface-variant)] text-center mt-1">
+                    Define the soul and style of your AI creation.
+                </p>
+</div>
+<section class="mb-6">
+<div class="flex items-center gap-2 mb-3">
+<span class="flex items-center justify-center w-6 h-6 rounded-full bg-[var(--surface-container)] text-[var(--tertiary-neon)] text-xs font-bold border border-[var(--outline)]">1</span>
+<h3 class="text-sm font-medium text-[var(--tertiary-neon)] tracking-wide uppercase">Visual Concept</h3>
+</div>
+<div class="m3-card p-4 space-y-4">
+<div>
+<label class="block text-xs text-[var(--on-surface-variant)] mb-3 ml-1">Core Aesthetic</label>
+<div class="flex flex-wrap gap-2">
+<button class="m3-chip px-4 text-sm font-medium text-[var(--on-surface-variant)] hover:text-white">Casual</button>
+<button class="m3-chip px-4 text-sm font-medium selected">Cyberpunk</button>
+<button class="m3-chip px-4 text-sm font-medium text-[var(--on-surface-variant)] hover:text-white">Ethereal</button>
+<button class="m3-chip px-4 text-sm font-medium text-[var(--on-surface-variant)] hover:text-white">Y2K</button>
+<button class="m3-chip px-4 text-sm font-medium text-[var(--on-surface-variant)] hover:text-white">High Teen</button>
+</div>
+</div>
+<div class="pt-2">
+<label class="block text-xs text-[var(--on-surface-variant)] mb-3 ml-1">Style Modifier</label>
+<div class="flex flex-wrap gap-2">
+<button class="m3-chip px-4 text-sm font-medium text-[var(--on-surface-variant)] hover:text-white">Dark</button>
+<button class="m3-chip px-4 text-sm font-medium text-[var(--on-surface-variant)] hover:text-white">Neon</button>
+<button class="m3-chip px-4 text-sm font-medium selected">Pastel Goth</button>
+<button class="m3-chip px-4 text-sm font-medium text-[var(--on-surface-variant)] hover:text-white">Minimal</button>
+</div>
+</div>
+</div>
+</section>
+<section class="mb-6">
+<div class="flex items-center gap-2 mb-3">
+<span class="flex items-center justify-center w-6 h-6 rounded-full bg-[var(--surface-container)] text-[var(--secondary-neon)] text-xs font-bold border border-[var(--outline)]">2</span>
+<h3 class="text-sm font-medium text-[var(--secondary-neon)] tracking-wide uppercase">Group Position</h3>
+</div>
+<div class="m3-card p-4">
+<div class="grid grid-cols-2 gap-3">
+<div class="relative group cursor-pointer">
+<input checked="" class="peer hidden" id="pos_vocal" name="position" type="radio"/>
+<label class="flex flex-col items-center justify-center p-3 rounded-xl border border-[var(--outline)] bg-[var(--surface)] peer-checked:border-[var(--secondary-neon)] peer-checked:bg-[rgba(138,92,255,0.1)] transition-all h-24" for="pos_vocal">
+<span class="material-symbols-outlined text-[var(--on-surface-variant)] peer-checked:text-[var(--secondary-neon)] mb-1">mic_external_on</span>
+<span class="text-xs font-medium text-[var(--on-surface)] peer-checked:text-white">Main Vocal</span>
+</label>
+</div>
+<div class="relative group cursor-pointer">
+<input class="peer hidden" id="pos_rapper" name="position" type="radio"/>
+<label class="flex flex-col items-center justify-center p-3 rounded-xl border border-[var(--outline)] bg-[var(--surface)] peer-checked:border-[var(--secondary-neon)] peer-checked:bg-[rgba(138,92,255,0.1)] transition-all h-24" for="pos_rapper">
+<span class="material-symbols-outlined text-[var(--on-surface-variant)] peer-checked:text-[var(--secondary-neon)] mb-1">graphic_eq</span>
+<span class="text-xs font-medium text-[var(--on-surface)] peer-checked:text-white">Main Rapper</span>
+</label>
+</div>
+<div class="relative group cursor-pointer">
+<input class="peer hidden" id="pos_dancer" name="position" type="radio"/>
+<label class="flex flex-col items-center justify-center p-3 rounded-xl border border-[var(--outline)] bg-[var(--surface)] peer-checked:border-[var(--secondary-neon)] peer-checked:bg-[rgba(138,92,255,0.1)] transition-all h-24" for="pos_dancer">
+<span class="material-symbols-outlined text-[var(--on-surface-variant)] peer-checked:text-[var(--secondary-neon)] mb-1">accessibility_new</span>
+<span class="text-xs font-medium text-[var(--on-surface)] peer-checked:text-white">Main Dancer</span>
+</label>
+</div>
+<div class="relative group cursor-pointer">
+<input class="peer hidden" id="pos_visual" name="position" type="radio"/>
+<label class="flex flex-col items-center justify-center p-3 rounded-xl border border-[var(--outline)] bg-[var(--surface)] peer-checked:border-[var(--secondary-neon)] peer-checked:bg-[rgba(138,92,255,0.1)] transition-all h-24" for="pos_visual">
+<span class="material-symbols-outlined text-[var(--on-surface-variant)] peer-checked:text-[var(--secondary-neon)] mb-1">camera</span>
+<span class="text-xs font-medium text-[var(--on-surface)] peer-checked:text-white">Visual Center</span>
+</label>
+</div>
+</div>
+</div>
+</section>
+<section class="mb-8">
+<div class="flex items-center gap-2 mb-3">
+<span class="flex items-center justify-center w-6 h-6 rounded-full bg-[var(--surface-container)] text-[var(--primary-neon)] text-xs font-bold border border-[var(--outline)]">3</span>
+<h3 class="text-sm font-medium text-[var(--primary-neon)] tracking-wide uppercase">Identity</h3>
+</div>
+<div class="m3-input-container px-4 py-2 flex flex-col">
+<label class="text-xs text-[var(--on-surface-variant)]">Stage Name</label>
+<input class="bg-transparent border-none text-white p-0 focus:ring-0 placeholder-gray-600 text-base" placeholder="e.g. Aeon" type="text"/>
+</div>
+</section>
+</main>
+<div class="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-[#0B0F14] via-[#0B0F14] to-transparent z-20">
+<button class="btn-primary-neon w-full flex items-center justify-center gap-2 relative overflow-hidden group">
+<span class="relative z-10 text-base">Summon My Idol</span>
+<span class="material-symbols-outlined relative z-10 text-[20px]">auto_fix_high</span>
+<div class="absolute inset-0 bg-white/20 translate-x-[-100%] skew-x-12 group-hover:animate-[shimmer_1s_infinite]"></div>
+</button>
+</div>
+</div>
+
+</body></html>

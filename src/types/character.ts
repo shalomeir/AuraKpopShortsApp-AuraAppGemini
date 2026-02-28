@@ -33,6 +33,7 @@ export interface Character {
   fan_level: number;
   follower_count: number;
   is_active: boolean;
+  avatar_url?: string;
   created_at: string;
   updated_at: string;
 }
