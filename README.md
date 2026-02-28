@@ -40,7 +40,7 @@ AURA 프로젝트는 차세대 생성형 AI 모델과 모던 웹 스택을 결�
 
 - **Frontend**: Next.js, React, Tailwind CSS
 - **Backend & Database**: Supabase (PostgreSQL, Auth, Edge Functions)
-- **Generative AI Core**: Google Cloud Vertex AI (Gemini 2.x Flash, Imagen 3, Veo)
+- **Generative AI Core**: Google Cloud Vertex AI (Gemini, Imagen 3, Veo)
 
 ---
 
