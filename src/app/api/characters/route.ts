@@ -21,7 +21,7 @@ interface CharacterCreatePayload {
 }
 
 /**
- * 캐릭터를 생성하고 초기 배치 큐(4건)를 등록한다.
+ * Creates a character and registers initial batch queue (4 items).
  */
 export async function POST(request: NextRequest) {
   const auth = await getAuthenticatedUser();

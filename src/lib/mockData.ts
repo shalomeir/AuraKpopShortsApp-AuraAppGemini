@@ -2,13 +2,13 @@ import { Character } from '@/types/character';
 import { Post, CharacterRanking } from '@/types/post';
 
 /**
- * DummyJSON을 사용해 가상의 서버 응답과 유사한 형태의 Mock Data를 생성하는 유틸리티
- * TRD 기반 KPOP AI 앱 "Aura"의 모델 요구사항에 맞게 매핑
+ * Utility for generating Mock Data simulating virtual server responses using DummyJSON
+ * Mapped to model requirements of TRD-based KPOP AI App "Aura"
  */
 
 const DUMMY_JSON_URL = 'https://dummyjson.com';
 
-// 0. Pexels 영상 쇼츠 URL 헬퍼 (API 키가 있으면 패치, 없으면 Fallback 제공)
+// 0. Pexels Video Shorts URL Helper (fetch if API key exists, otherwise provide fallback)
 async function getMockVideoUrl(index: number): Promise<string> {
   const pexelsKey = process.env.NEXT_PUBLIC_PEXELS_API_KEY || process.env.PEXELS_API_KEY;
   if (pexelsKey) {
@@ -28,7 +28,7 @@ async function getMockVideoUrl(index: number): Promise<string> {
     }
   }
   
-  // Fallback (공개 무료 샘플 비디오 링크)
+  // Fallback (public free sample video links)
   const fallbacks = [
     'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
     'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
@@ -37,7 +37,7 @@ async function getMockVideoUrl(index: number): Promise<string> {
   return fallbacks[index % fallbacks.length];
 }
 
-// 0.5. Unsplash API 헬퍼
+// 0.5. Unsplash API helper
 async function getMockImageUrl(index: number, type: 'avatar' | 'post'): Promise<string> {
   const unsplashKey = process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY || process.env.UNSPLASH_ACCESS_KEY;
   if (unsplashKey) {
@@ -57,22 +57,22 @@ async function getMockImageUrl(index: number, type: 'avatar' | 'post'): Promise<
     }
   }
   
-  // Fallback (API 키 없을 때 loremflickr 사용)
+  // Fallback (use loremflickr when no API key)
   const width = type === 'avatar' ? 200 : 400;
   const height = type === 'avatar' ? 200 : 600;
   const keyword = type === 'avatar' ? 'face,portrait' : 'kpop,dance';
   return `https://loremflickr.com/${width}/${height}/${keyword}?random=${index}`;
 }
 
-// 1. 캐릭터 목록 Mock (DummyJSON Users 활용)
+// 1. Character List Mock (using DummyJSON Users)
 export async function getMockCharacters(limit = 10, skip = 0): Promise<Character[]> {
   try {
     const res = await fetch(`${DUMMY_JSON_URL}/users?limit=${limit}&skip=${skip}`);
     const data = await res.json();
     
-    // 순차적으로 API 호출 방지 (병렬 혹은 먼저 생성된 URL 연동)
+    // Avoid sequential API calls (parallel or linked to previously generated URL)
     const characters = await Promise.all(data.users.map(async (user: Record<string, unknown>) => {
-      // DummyJSON의 User 데이터를 Aura의 Character 도메인 스키마에 맞게 맵핑
+      // Map DummyJSON User data to Aura Character domain schema
       const gender = user.gender === 'male' ? 'male' : 'female';
       const age = Number(user.age) || 20;
       const age_range = age < 20 ? 'teen' : (age < 30 ? 'twenties' : 'thirties');
@@ -90,11 +90,11 @@ export async function getMockCharacters(limit = 10, skip = 0): Promise<Character
 
       return {
         id: `char_${idStr}`,
-        owner_id: `owner_${Math.floor(Math.random() * 10)}`, // Auth 유저 목업
+        owner_id: `owner_${Math.floor(Math.random() * 10)}`, // Auth user mock
         name: `${firstName} ${lastName}`,
         gender,
         age_range,
-        nationality: (user.address as Record<string, unknown>)?.country || 'Korea', // 더미 json엔 주로 USA
+        nationality: (user.address as Record<string, unknown>)?.country || 'Korea', // Dummy json mostly has USA
         face_shape: 'v-line',
         hair_color: (user.hair as Record<string, unknown>)?.color || 'black',
         fashion_mood: 'trendy',
@@ -105,7 +105,7 @@ export async function getMockCharacters(limit = 10, skip = 0): Promise<Character
         comment_tone: 'friendly',
         activity_modes: ['performance', 'daily'],
         memory: {
-          debut_story: `${firstName} 데뷔 스토리...`,
+          debut_story: `${firstName} Debut Story...`,
           milestones: [],
           last_event: null,
           post_count: 0
@@ -113,7 +113,7 @@ export async function getMockCharacters(limit = 10, skip = 0): Promise<Character
         fan_level: age * 2,
         follower_count: Math.floor(Math.random() * 50000),
         is_active: true,
-        // Unsplash API를 사용하여 KPOP 아이돌 초상화 스타일 적용
+        // Apply KPOP idol portrait styling using Unsplash API
         avatar_url: avatarUrl,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
@@ -126,13 +126,13 @@ export async function getMockCharacters(limit = 10, skip = 0): Promise<Character
   }
 }
 
-// 2. 피드/포스트 Mock (DummyJSON Posts 활용)
+// 2. Feed/Post Mock (using DummyJSON Posts)
 export async function getMockPosts(limit = 10, skip = 0): Promise<Post[]> {
   try {
     const res = await fetch(`${DUMMY_JSON_URL}/posts?limit=${limit}&skip=${skip}`);
     const data = await res.json();
     
-    // 포스트 이미지용: DummyJSON의 Recipe 썸네일 대신 Unsplash 및 Pexels 비디오 적용
+    // For post image: Apply Unsplash and Pexels videos instead of DummyJSON Recipe thumbnails
     const posts = await Promise.all(data.posts.map(async (post: Record<string, unknown>, index: number) => {
       const modeOptions = ['performance', 'daily', 'meme', 'fan'];
       const idNum = Number(post.id) || 0;
@@ -151,10 +151,10 @@ export async function getMockPosts(limit = 10, skip = 0): Promise<Post[]> {
 
       return {
         id: `post_${idStr}`,
-        character_id: `char_${((Number(post.userId) - 1) % 10) + 1}`, // Feed와 매칭되도록 1~10 캐릭터 ID로 한정 매핑
-        content_type: isVideo ? 'moving_poster' : 'image', // 1/3 확률로 무빙포스터
+        character_id: `char_${((Number(post.userId) - 1) % 10) + 1}`, // Limit mapping to character IDs 1~10 to match Feed
+        content_type: isVideo ? 'moving_poster' : 'image', // 1/3 chance of moving poster
         caption: String(post.body || '').slice(0, 100) + '... #' + (tags[0] || 'KPOP'), 
-        // 9:16 비율 (세로 숏폼 포맷 모방)을 위해 Unsplash (또는 Pexels) 사용
+        // Use Unsplash (or Pexels) for 9:16 ratio (mimicking vertical short-form format)
         media_url: mediaUrl,
         media_thumb_url: mediaThumbUrl,
         activity_mode,
@@ -164,7 +164,7 @@ export async function getMockPosts(limit = 10, skip = 0): Promise<Post[]> {
         view_count: (reactions.likes || 0) * Math.floor(Math.random() * 5 + 2),
         share_count: Math.floor((reactions.likes || 0) / 10),
         status: 'published',
-        created_at: new Date(Date.now() - (idNum * 3600000)).toISOString() // 최근 n시간 이내로 임의 분산
+        created_at: new Date(Date.now() - (idNum * 3600000)).toISOString() // Randomly distributed within recent n hours
       };
     }));
     
@@ -175,11 +175,11 @@ export async function getMockPosts(limit = 10, skip = 0): Promise<Post[]> {
   }
 }
 
-// 3. 인기 랭킹 Mock
+// 3. Popular Ranking Mock
 export async function getMockRanking(limit = 20): Promise<CharacterRanking[]> {
   const characters = await getMockCharacters(limit);
   
-  // Follower 순 정렬
+  // Sort by follower order
   const ranked = characters.map((c) => ({
     id: c.id,
     name: c.name,

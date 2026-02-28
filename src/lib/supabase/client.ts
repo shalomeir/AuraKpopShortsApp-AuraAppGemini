@@ -2,7 +2,7 @@ import { createBrowserClient } from "@supabase/ssr";
 import { requireEnv } from "@/lib/env";
 
 /**
- * 브라우저 컴포넌트에서 사용할 Supabase 클라이언트.
+ * Supabase client for browser components.
  */
 export function createSupabaseBrowserClient() {
   return createBrowserClient(

@@ -8,7 +8,7 @@ export interface ApiErrorBody {
 }
 
 /**
- * API 에러 응답 포맷을 프로젝트 전체에서 일관되게 유지한다.
+ * Maintains a consistent API error response format across the project.
  */
 export function errorResponse(
   code: string,

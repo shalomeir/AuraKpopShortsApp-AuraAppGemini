@@ -15,9 +15,9 @@ export default async function FeedPage() {
       <div className="absolute top-0 w-full z-20 flex px-4">
         {/* Top Navigation Tabs */}
         <div className="flex gap-4 items-center flex-1 mt-[16px] overflow-x-auto scrollbar-hide">
-          <button className="h-12 border-b-2 border-aura-primary font-bold text-white whitespace-nowrap px-1">추천</button>
-          <button className="h-12 border-b-2 border-transparent font-medium text-zinc-400 whitespace-nowrap px-1">팔로우</button>
-          <button className="h-12 border-b-2 border-transparent font-medium text-zinc-400 whitespace-nowrap px-1">내 캐릭터</button>
+          <button className="h-12 border-b-2 border-aura-primary font-bold text-white whitespace-nowrap px-1">For You</button>
+          <button className="h-12 border-b-2 border-transparent font-medium text-zinc-400 whitespace-nowrap px-1">Following</button>
+          <button className="h-12 border-b-2 border-transparent font-medium text-zinc-400 whitespace-nowrap px-1">My Idols</button>
         </div>
       </div>
 

@@ -3,7 +3,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { errorResponse } from "@/lib/api-response";
 
 /**
- * 팔로워/팬레벨 기준 캐릭터 랭킹을 조회한다.
+ * Fetches character ranking based on followers/fan levels.
  */
 export async function GET(request: NextRequest) {
   const supabase = createSupabaseServerClient();

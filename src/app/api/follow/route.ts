@@ -29,7 +29,7 @@ async function recalculateFollowerCount(characterId: string) {
 }
 
 /**
- * 캐릭터를 팔로우한다.
+ * Follows a character.
  */
 export async function POST(request: NextRequest) {
   const auth = await getAuthenticatedUser();
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * 캐릭터 팔로우를 해제한다.
+ * Unfollows a character.
  */
 export async function DELETE(request: NextRequest) {
   const auth = await getAuthenticatedUser();

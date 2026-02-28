@@ -2,8 +2,8 @@ import { createClient } from "@supabase/supabase-js";
 import { requireEnv } from "@/lib/env";
 
 /**
- * 서버 전용 service role 클라이언트.
- * 집계 카운트 갱신처럼 RLS 우회가 필요한 내부 작업에서만 사용한다.
+ * Server-only service role client.
+ * Used only for internal tasks that require bypassing RLS, like updating aggregate counts.
  */
 export function createSupabaseAdminClient() {
   return createClient(

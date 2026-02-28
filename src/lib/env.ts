@@ -1,6 +1,6 @@
 /**
- * 서버/클라이언트 공통 환경변수를 안전하게 읽기 위한 헬퍼.
- * 누락된 값을 조기에 실패시켜 배포 환경에서의 런타임 오류를 줄인다.
+ * Helper to safely read server/client common environment variables.
+ * Fails early on missing values to reduce runtime errors in deployment.
  */
 export function requireEnv(name: string): string {
   const value = process.env[name];

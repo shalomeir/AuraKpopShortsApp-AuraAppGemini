@@ -23,7 +23,7 @@ export default function LoginPage() {
 
     if (error) {
       setIsLoading(false);
-      alert(`로그인 실패: ${error.message}`);
+      alert(`Login failed: ${error.message}`);
       return;
     }
   };
@@ -37,7 +37,7 @@ export default function LoginPage() {
           AURA
         </h1>
         <p className="text-zinc-400 text-sm mb-12 text-center">
-          AI KPOP 아이돌 가상 소셜 플랫폼
+          AI KPOP Idol Virtual Social Platform
         </p>
 
         <button
@@ -67,7 +67,7 @@ export default function LoginPage() {
               />
             </svg>
           )}
-          {isLoading ? '로그인 중...' : 'Google로 계속하기'}
+          {isLoading ? 'Logging in...' : 'Continue with Google'}
         </button>
 
         <button
@@ -75,11 +75,11 @@ export default function LoginPage() {
           disabled={isLoading}
           className="w-full mt-4 flex items-center justify-center font-bold text-zinc-300 rounded-full h-14 bg-aura-surfaceContainer border border-aura-outline hover:bg-aura-surfaceVariant transition-colors disabled:opacity-50"
         >
-          둘러보기로 계속하기
+          Continue as Guest
         </button>
 
         <p className="mt-8 text-zinc-500 text-xs text-center max-w-[240px] leading-relaxed">
-          계속 진행하면 AURA의 이용약관 및 개인정보처리방침에 동의하게 됩니다.
+          By continuing, you agree to AURA&apos;s Terms of Service and Privacy Policy.
         </p>
       </div>
     </main>

@@ -31,7 +31,7 @@ async function recalculateLikeCount(postId: string) {
 }
 
 /**
- * 포스트 좋아요를 생성한다.
+ * Creates a post like.
  */
 export async function POST(
   _request: Request,
@@ -63,7 +63,7 @@ export async function POST(
 }
 
 /**
- * 포스트 좋아요를 취소한다.
+ * Cancels a post like.
  */
 export async function DELETE(
   _request: Request,

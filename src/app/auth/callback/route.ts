@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 /**
- * Supabase OAuth 인증 코드를 세션으로 교환한 뒤 홈으로 이동한다.
+ * Exchanges Supabase OAuth auth code for a session and redirects home.
  */
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);

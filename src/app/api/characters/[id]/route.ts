@@ -9,7 +9,7 @@ interface RouteContext {
 }
 
 /**
- * 캐릭터 상세와 최근 포스트를 조회한다.
+ * Fetches character details and recent posts.
  */
 export async function GET(
   _request: Request,

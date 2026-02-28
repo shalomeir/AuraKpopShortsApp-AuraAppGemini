@@ -12,7 +12,7 @@ function parseLimit(value: string | null): number {
 }
 
 /**
- * 추천/팔로우/내 캐릭터 탭 기준의 피드를 조회한다.
+ * Fetches feed based on For You/Following/My Idols tabs.
  */
 export async function GET(request: NextRequest) {
   const supabase = createSupabaseServerClient();

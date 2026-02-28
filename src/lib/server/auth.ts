@@ -7,7 +7,7 @@ export interface AuthUserResult {
 }
 
 /**
- * API 라우트에서 인증된 사용자 정보를 가져온다.
+ * Retrieves authenticated user information from API route.
  */
 export async function getAuthenticatedUser(): Promise<
   AuthUserResult | ReturnType<typeof errorResponse>
