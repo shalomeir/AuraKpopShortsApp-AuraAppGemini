@@ -5,6 +5,7 @@
 - [x] Mockup Data 생성 (DummyJSON 활용한 개발용 뼈대)
 - [x] Next.js 프로젝트 초기화 (shadcn/ui 세팅)
 - [x] Supabase 프로젝트 셋업 + DB 마이그레이션
+- [x] 통합 환경 연동 완료 (Vercel 배포 준비, Supabase 원격 연결, GCP Vertex & Gemini 2.x Flash 설정 및 ADC 인증)
 - [ ] Auth (Google OAuth + 이메일)
 - [ ] 캐릭터 생성 API + UI (4단계 위저드)
 - [ ] 배치 큐 등록 로직

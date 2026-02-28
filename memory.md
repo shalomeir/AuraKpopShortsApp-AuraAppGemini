@@ -15,17 +15,22 @@
    - `Unsplash API`(이미지) 및 `Pexels API`(동영상) 연동을 통해 목업 미디어(사진/세로형 영상) 생성 처리 구축 (API Key 존재 시 실제 호출, Fallback 지원)
 4. **환경 설정 가이드 셋업**:
    - `.env.example` 작성: Supabase, GCP, AI Provider(Anthropic/OpenAI/Google), 미디어 API(Unsplash/Pexels) Key 정보 안내
-5. **서버/API 1차 구현 (Supabase 기반)**:
+5. **GCP, Supabase, Vercel 연동 완료**:
+   - GCP 프로젝트(`aura-kpop-gemini`) 생성 및 결제 프로필($300 크레딧) 연동 확인 완료
+   - 로컬 `application-default` 터미널 인증(`ADC`) 기반의 GCP Vertex AI SDK 셋업 완료
+   - 하위 버전(1.5) 대신 최신형 **Gemini 2.5 Flash / 2.0 Flash** 모델 연동 및 통신 테스트 100% 통과
+   - Vercel 앱 환경 및 Supabase 리모트 저장소 연동 정상화 확인
+6. **서버/API 1차 구현 (Supabase 기반)**:
    - `src/lib/supabase/{client,server,admin}.ts` 추가
    - `src/app/api/feed/route.ts`
    - `src/app/api/characters/route.ts`, `src/app/api/characters/[id]/route.ts`
    - `src/app/api/ranking/route.ts`
    - `src/app/api/follow/route.ts`
    - `src/app/api/posts/[id]/like/route.ts`
-6. **인증 플로우 개선**:
+7. **인증 플로우 개선**:
    - `src/app/auth/callback/route.ts` 추가
    - `login/profile` 페이지를 localStorage mock에서 Supabase 세션 기반으로 변경
-7. **DB/문서/배포 설정 보강**:
+8. **DB/문서/배포 설정 보강**:
    - `supabase/migrations/20260228162000_init_aura.sql` 추가
    - OpenAPI 문서 `docs/openapi.yaml` 추가
    - `README.md`, `.env.example`, `vercel.json` 업데이트
