@@ -2,6 +2,7 @@
 
 ## P0 (Week 1) — 작동하는 뼈대
 
+- [x] Mockup Data 생성 (DummyJSON 활용한 개발용 뼈대)
 - [x] Next.js 프로젝트 초기화 (shadcn/ui 세팅)
 - [ ] Supabase 프로젝트 셋업 + DB 마이그레이션
 - [ ] Auth (Google OAuth + 이메일)
