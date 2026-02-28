@@ -1,0 +1,231 @@
+openapi: 3.0.3
+info:
+  title: Aura API
+  version: 0.1.0
+  description: Aura MVP 서버 API 문서
+servers:
+  - url: http://localhost:8000
+    description: Local
+  - url: https://{project}.vercel.app
+    description: Vercel
+    variables:
+      project:
+        default: aura-app
+paths:
+  /api/feed:
+    get:
+      summary: 피드 조회
+      parameters:
+        - in: query
+          name: tab
+          schema:
+            type: string
+            enum: [recommended, following, mine]
+            default: recommended
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              example:
+                posts:
+                  - id: c9efb0de-44ff-4fbe-a8a3-8de9de4a3ac5
+                    character_id: e3312354-a534-4da9-89dd-64e6cc0c8ed2
+                    content_type: image
+                    caption: 오늘도 무대 위에서 빛날게요! #AURA #KPOP
+                    media_url: https://example.com/image.webp
+                    like_count: 132
+                    share_count: 5
+                    created_at: "2026-02-28T04:10:00.000Z"
+                    character:
+                      id: e3312354-a534-4da9-89dd-64e6cc0c8ed2
+                      name: Aura Nova
+                      avatar_url: https://example.com/avatar.webp
+                      follower_count: 1024
+                      fan_level: 5
+                nextCursor: null
+        "401":
+          description: 인증 필요
+          content:
+            application/json:
+              example:
+                error:
+                  code: UNAUTHORIZED
+                  message: Authentication required.
+  /api/characters:
+    post:
+      summary: 캐릭터 생성
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              name: Aura Nova
+              gender: female
+              ageRange: twenties
+              nationality: Korea
+              concept: cute
+              position: [main_vocal]
+              signatureMood: bright
+              persona: casual
+              commentTone: friendly
+              activityModes: [performance, daily]
+      responses:
+        "201":
+          description: 생성 성공
+          content:
+            application/json:
+              example:
+                character:
+                  id: e3312354-a534-4da9-89dd-64e6cc0c8ed2
+                  owner_id: 2f3d8c10-c8bf-4a03-bcb2-e1c5db55f3b0
+                  name: Aura Nova
+                  concept: cute
+                  created_at: "2026-02-28T04:10:00.000Z"
+        "400":
+          description: 요청 오류
+          content:
+            application/json:
+              example:
+                error:
+                  code: VALIDATION_ERROR
+                  message: name is required.
+        "401":
+          description: 인증 필요
+          content:
+            application/json:
+              example:
+                error:
+                  code: UNAUTHORIZED
+                  message: Authentication required.
+  /api/characters/{id}:
+    get:
+      summary: 캐릭터 상세 조회
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              example:
+                character:
+                  id: e3312354-a534-4da9-89dd-64e6cc0c8ed2
+                  name: Aura Nova
+                  follower_count: 1024
+                recentPosts:
+                  - id: c9efb0de-44ff-4fbe-a8a3-8de9de4a3ac5
+                    caption: 오늘도 무대 위에서 빛날게요!
+        "404":
+          description: 대상 없음
+          content:
+            application/json:
+              example:
+                error:
+                  code: NOT_FOUND
+                  message: Character not found.
+  /api/ranking:
+    get:
+      summary: 랭킹 조회
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 50
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              example:
+                characters:
+                  - id: e3312354-a534-4da9-89dd-64e6cc0c8ed2
+                    name: Aura Nova
+                    avatar_url: https://example.com/avatar.webp
+                    follower_count: 1024
+                    fan_level: 5
+  /api/follow:
+    post:
+      summary: 팔로우 생성
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              characterId: e3312354-a534-4da9-89dd-64e6cc0c8ed2
+      responses:
+        "200":
+          description: 처리 성공
+          content:
+            application/json:
+              example:
+                success: true
+        "401":
+          description: 인증 필요
+          content:
+            application/json:
+              example:
+                error:
+                  code: UNAUTHORIZED
+                  message: Authentication required.
+    delete:
+      summary: 팔로우 해제
+      parameters:
+        - in: query
+          name: characterId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: 처리 성공
+          content:
+            application/json:
+              example:
+                success: true
+  /api/posts/{id}/like:
+    post:
+      summary: 좋아요 추가
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: 처리 성공
+          content:
+            application/json:
+              example:
+                success: true
+    delete:
+      summary: 좋아요 취소
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: 처리 성공
+          content:
+            application/json:
+              example:
+                success: true
+

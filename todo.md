@@ -4,10 +4,11 @@
 
 - [x] Mockup Data 생성 (DummyJSON 활용한 개발용 뼈대)
 - [x] Next.js 프로젝트 초기화 (shadcn/ui 세팅)
-- [ ] Supabase 프로젝트 셋업 + DB 마이그레이션
+- [x] Supabase 프로젝트 셋업 + DB 마이그레이션
 - [ ] Auth (Google OAuth + 이메일)
 - [ ] 캐릭터 생성 API + UI (4단계 위저드)
 - [ ] 배치 큐 등록 로직
+- [x] 서버 API 1차 구현 (feed, characters, ranking, follow, like)
 
 ## P1 (Week 1~2) — 핵심 기능
 
