@@ -1,6 +1,7 @@
 import { errorResponse } from "@/lib/api-response";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getDevBypassUserId } from "@/lib/server/dev-auth";
 
 export interface AuthUserResult {
   userId: string;
@@ -56,6 +57,10 @@ export async function getAuthenticatedUser(): Promise<
   } = await supabase.auth.getUser();
 
   if (error || !user) {
+    const devUserId = getDevBypassUserId();
+    if (devUserId) {
+      return { userId: devUserId, supabase };
+    }
     return errorResponse("UNAUTHORIZED", "Authentication required.", 401);
   }
 

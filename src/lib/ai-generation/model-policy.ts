@@ -1,7 +1,7 @@
 export type TextModelTask = "simple" | "reasoning";
 
-const defaultSimpleTextModel = "gemini-3-flash";
-const defaultReasoningModel = "gemini-3.1-pro";
+const defaultSimpleTextModel = "gemini-2.0-flash-001";
+const defaultReasoningModel = "gemini-2.0-flash-001";
 const defaultImageModel = "nano-banana-2";
 const defaultVideoModel = "veo-3-fast";
 const defaultAudioPrimaryModel = "lyria-3";

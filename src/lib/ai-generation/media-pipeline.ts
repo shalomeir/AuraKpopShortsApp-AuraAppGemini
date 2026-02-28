@@ -1,6 +1,7 @@
 import {
   resolveAudioModels,
   resolveImageModel,
+  resolveTextModel,
   resolveVideoModel,
 } from "@/lib/ai-generation/model-policy";
 
@@ -26,6 +27,7 @@ export function buildMediaPipelinePlan(input: BuildMediaPipelinePlanInput) {
   const imageModel = resolveImageModel();
   const videoModel = resolveVideoModel();
   const audioModels = resolveAudioModels();
+  const reasoningModel = resolveTextModel("reasoning");
 
   const personaLock = {
     characterId: input.character.id,
@@ -56,7 +58,7 @@ export function buildMediaPipelinePlan(input: BuildMediaPipelinePlanInput) {
         },
       ],
       estimatedPrimaryModels: {
-        textReasoning: process.env.MODEL_REASONING ?? "gemini-3.1-pro",
+        textReasoning: reasoningModel,
         image: imageModel,
       },
     };
@@ -102,7 +104,7 @@ export function buildMediaPipelinePlan(input: BuildMediaPipelinePlanInput) {
       },
     ],
     estimatedPrimaryModels: {
-      textReasoning: process.env.MODEL_REASONING ?? "gemini-3.1-pro",
+      textReasoning: reasoningModel,
       image: imageModel,
       video: videoModel,
       audio: audioModels.primary,

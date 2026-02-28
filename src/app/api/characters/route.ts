@@ -19,6 +19,13 @@ interface CharacterCreatePayload {
   commentTone?: string;
   activityModes?: string[];
   avatarUrl?: string;
+  memory?: {
+    debut_story?: string | null;
+    milestones?: string[];
+    last_event?: string | null;
+    post_count?: number;
+    [key: string]: unknown;
+  };
 }
 
 /**
@@ -61,6 +68,10 @@ export async function POST(request: NextRequest) {
       comment_tone: payload.commentTone ?? "friendly",
       activity_modes: payload.activityModes ?? ["performance", "daily"],
       avatar_url: payload.avatarUrl ?? null,
+      memory:
+        payload.memory && typeof payload.memory === "object"
+          ? payload.memory
+          : undefined,
     })
     .select("*")
     .single();

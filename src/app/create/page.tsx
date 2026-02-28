@@ -17,6 +17,24 @@ export default function CreateCharacterPage() {
   });
   const [isGenerating, setIsGenerating] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [generatedSummary, setGeneratedSummary] = useState<{
+    shortBio: string;
+    debutCopy: string;
+  } | null>(null);
+
+  const conceptToSignatureMood: Record<string, string> = {
+    cute: "bright",
+    sexy: "mysterious",
+    boyish: "dark",
+    innocent: "bright",
+  };
+
+  const personaToCommentTone: Record<string, string> = {
+    casual: "friendly",
+    perfect: "chic",
+    quirky: "playful",
+    artist: "chic",
+  };
 
   const handleNext = () => {
     if (step < 4) setStep(step + 1);
@@ -28,20 +46,93 @@ export default function CreateCharacterPage() {
 
     setIsGenerating(true);
     setErrorMessage(null);
+    setGeneratedSummary(null);
 
     try {
+      const generateResponse = await fetch("/api/ai/character-generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          profile: {
+            gender: formData.gender,
+            ageRange: "twenties",
+            nationality: "Korea",
+            faceShape: "v-line",
+            hairColor: "black",
+            fashionMood: "trendy",
+            concept: formData.concept,
+          },
+          idol: {
+            positions: [formData.position],
+            signatureMood: conceptToSignatureMood[formData.concept] ?? "bright",
+            persona: formData.persona,
+          },
+          activityModes: ["performance", "daily", "meme", "fan"],
+          commentTone: personaToCommentTone[formData.persona] ?? "friendly",
+          language: "en",
+          characterNameHint: formData.name.trim(),
+        }),
+      });
+
+      const generatedBody = (await generateResponse.json()) as {
+        character?: {
+          name: string;
+          shortBio: string;
+          debutCopy: string;
+          visualPrompt: string;
+          memeVideoPrompt: string;
+          tags: string[];
+        };
+        error?: { message?: string };
+      };
+
+      if (!generateResponse.ok || !generatedBody.character) {
+        setErrorMessage(
+          generatedBody.error?.message ??
+            "Character generation failed. Please retry.",
+        );
+        return;
+      }
+
+      setGeneratedSummary({
+        shortBio: generatedBody.character.shortBio,
+        debutCopy: generatedBody.character.debutCopy,
+      });
+
       const response = await fetch("/api/characters", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: formData.name.trim(),
+          name: generatedBody.character.name || formData.name.trim(),
           gender: formData.gender,
+          ageRange: "twenties",
+          nationality: "Korea",
+          faceShape: "v-line",
+          hairColor: "black",
+          fashionMood: "trendy",
           concept: formData.concept,
           position: [formData.position],
+          signatureMood: conceptToSignatureMood[formData.concept] ?? "bright",
           persona: formData.persona,
+          commentTone: personaToCommentTone[formData.persona] ?? "friendly",
           activityModes: ["performance", "daily", "meme", "fan"],
+          memory: {
+            debut_story: generatedBody.character.debutCopy,
+            milestones: [
+              `Debut Bio: ${generatedBody.character.shortBio}`,
+              `Launch Tags: ${generatedBody.character.tags.join(", ")}`,
+            ],
+            last_event: "Character profile generated with Aura LLM pipeline.",
+            post_count: 0,
+            generation: {
+              visual_prompt: generatedBody.character.visualPrompt,
+              meme_video_prompt: generatedBody.character.memeVideoPrompt,
+            },
+          },
         }),
       });
 
@@ -192,6 +283,12 @@ export default function CreateCharacterPage() {
       </div>
 
       <div className="p-4 mt-auto">
+        {generatedSummary ? (
+          <div className="mb-3 rounded-xl border border-aura-secondary/40 bg-aura-secondary/10 p-3">
+            <p className="text-xs font-bold text-aura-secondary mb-1">LLM Preview</p>
+            <p className="text-xs text-zinc-200">{generatedSummary.shortBio}</p>
+          </div>
+        ) : null}
         {errorMessage ? (
           <p className="text-sm text-red-400 mb-3">{errorMessage}</p>
         ) : null}

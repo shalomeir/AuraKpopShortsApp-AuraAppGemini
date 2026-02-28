@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Settings2, Zap, ArrowUp } from "lucide-react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getDevBypassUserId } from "@/lib/server/dev-auth";
 
 interface ManagedCharacter {
   id: string;
@@ -16,13 +17,15 @@ export default async function ManagePage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  const fallbackUserId = getDevBypassUserId();
+  const userId = user?.id ?? fallbackUserId;
 
   let chars: ManagedCharacter[] = [];
-  if (user) {
+  if (userId) {
     const { data } = await supabase
       .from("characters")
       .select("id, name, avatar_url, follower_count, fan_level")
-      .eq("owner_id", user.id)
+      .eq("owner_id", userId)
       .order("created_at", { ascending: false });
 
     chars = (data ?? []) as ManagedCharacter[];

@@ -8,7 +8,9 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { ManageToneSettings } from "./tone-settings";
+import { ManageAiActions } from "./ai-actions";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getDevBypassUserId } from "@/lib/server/dev-auth";
 import { redirect } from "next/navigation";
 
 interface ManagedCharacterDetail {
@@ -43,8 +45,10 @@ export default async function ManageCharacterDetailPage({
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  const fallbackUserId = getDevBypassUserId();
+  const userId = user?.id ?? fallbackUserId;
 
-  if (!user) {
+  if (!userId) {
     redirect("/login");
   }
 
@@ -52,7 +56,7 @@ export default async function ManageCharacterDetailPage({
     .from("characters")
     .select("id, name, concept, comment_tone, avatar_url, fan_level, follower_count, memory")
     .eq("id", params.id)
-    .eq("owner_id", user.id)
+    .eq("owner_id", userId)
     .single();
 
   if (!charData) {
@@ -214,7 +218,10 @@ export default async function ManageCharacterDetailPage({
         </div>
 
         {/* Tone Settings (client component for interactivity) */}
-          <ManageToneSettings initialTone={char.comment_tone || "friendly"} />
+        <ManageToneSettings initialTone={char.comment_tone || "friendly"} />
+
+        {/* LLM Actions (client component for API execution) */}
+        <ManageAiActions characterId={char.id} />
 
         {/* Memory Milestones */}
         <div className="bg-aura-surfaceVariant border border-aura-outline rounded-2xl p-4 flex flex-col gap-3">

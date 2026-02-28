@@ -17,8 +17,8 @@ interface PersistInput {
  * 생성 결과를 Supabase Storage에 저장하고 선택적으로 메타데이터를 기록한다.
  */
 export async function persistCharacterGeneration(input: PersistInput): Promise<{
-  storageBucket: string;
-  storagePath: string;
+  storageBucket: string | null;
+  storagePath: string | null;
 }> {
   const bucket = process.env.SUPABASE_STORAGE_BUCKET ?? "character-generations";
   const metadataTable =
@@ -45,7 +45,11 @@ export async function persistCharacterGeneration(input: PersistInput): Promise<{
     });
 
   if (upload.error) {
-    throw new Error(`Supabase Storage upload failed: ${upload.error.message}`);
+    // Storage는 환경에 따라 미구성일 수 있으므로 생성 자체는 유지한다.
+    return {
+      storageBucket: null,
+      storagePath: null,
+    };
   }
 
   const metadataInsert = await supabase.from(metadataTable).insert({

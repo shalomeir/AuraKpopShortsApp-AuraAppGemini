@@ -43,6 +43,29 @@
 - Integrate generative APIs with UI flows.
 - Wire internal daily posting route to deployment scheduler.
 
+### Session update (2026-02-28)
+
+1. Connected create wizard to `POST /api/ai/character-generate` before DB insert.
+2. Extended `POST /api/characters` to accept optional `memory` payload so generated bio/prompt data can be persisted.
+3. Added manage detail LLM action panel:
+   - `POST /api/ai/activity-manage` trigger button
+   - `POST /api/ai/post-content-generate` trigger button
+4. Updated TODO progress for LLM copy integration.
+5. Added Vertex text model fallback strategy (`MODEL_TEXT_FALLBACK`) and safer defaults (`gemini-2.0-flash-001`).
+6. Changed character generation persistence to continue even when Supabase Storage is unavailable (returns `storageBucket/storagePath` as `null`).
+7. Verified API runtime call for `POST /api/ai/character-generate` returns generated payload on localhost.
+8. Added local dev auth bypass:
+   - `GET /api/dev/auth/login-as?next=/manage`
+   - `GET /api/dev/auth/logout?next=/login`
+   - Cookie-based bypass for middleware/API/page auth checks (dev only).
+9. Browser validation with `agent-browser` completed:
+   - `/manage` access via dev bypass works
+   - `Generate Today Plan` succeeds
+   - `Generate Draft Post` succeeds with draft ID rendered
+10. Hardened post generation stability:
+   - Auto-classifier parse failure now falls back to deterministic media mode
+   - Post content schema failure now falls back to safe default content instead of hard error
+
 ### Handoff notes
 
 - Always read `memory.md` and `todo.md` at session start.

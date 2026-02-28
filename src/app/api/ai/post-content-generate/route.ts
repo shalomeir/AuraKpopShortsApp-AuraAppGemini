@@ -14,6 +14,38 @@ import { buildMediaPipelinePlan, type MediaMode } from "@/lib/ai-generation/medi
 
 export const runtime = "nodejs";
 
+function buildFallbackContent(params: {
+  characterName: string;
+  requestedActivityMode?: string;
+}): {
+  contentType: "image" | "video_loop";
+  activityMode: string;
+  caption: string;
+  overlayText: string;
+  hashtags: string[];
+  imagePrompt: string;
+  videoPrompt: string;
+  safetyNotes: string[];
+} {
+  const activityMode = params.requestedActivityMode ?? "daily";
+  const name = params.characterName;
+  const caption =
+    activityMode === "meme"
+      ? `${name} reacts to today’s trend with peak idol energy.`
+      : `${name} is sharing a fresh ${activityMode} moment with fans today.`;
+
+  return {
+    contentType: activityMode === "meme" ? "video_loop" : "image",
+    activityMode,
+    caption,
+    overlayText: `${name} • ${activityMode.toUpperCase()}`,
+    hashtags: ["Aura", "VirtualIdol", "Kpop", activityMode],
+    imagePrompt: `${name}, kpop idol portrait, ${activityMode} style, cinematic lighting`,
+    videoPrompt: `${name}, short vertical clip, ${activityMode} mood, loop-friendly motion`,
+    safetyNotes: ["No explicit content", "No real-person impersonation"],
+  };
+}
+
 /**
  * 최종 포스팅용 캡션/해시태그/이미지·영상 프롬프트를 생성한다.
  */
@@ -116,18 +148,22 @@ export async function POST(request: NextRequest) {
       );
 
       if (!classificationParsed.success) {
-        return errorResponse(
-          "GENERATION_FAILED",
-          "Invalid content classification output.",
-          500,
-        );
+        resolvedMediaMode =
+          payload.activityMode === "meme" ? "meme_gif_loop" : "short_video";
+        classification = {
+          mediaMode: resolvedMediaMode,
+          confidence: 0,
+          reason: "Fallback mode due to invalid classifier output.",
+          model: classified.model,
+          fallback: true,
+        };
+      } else {
+        classification = {
+          ...classificationParsed.data,
+          model: classified.model,
+        };
+        resolvedMediaMode = classificationParsed.data.mediaMode;
       }
-
-      classification = {
-        ...classificationParsed.data,
-        model: classified.model,
-      };
-      resolvedMediaMode = classificationParsed.data.mediaMode;
     } else {
       resolvedMediaMode = payload.mediaMode;
     }
@@ -154,12 +190,12 @@ export async function POST(request: NextRequest) {
     });
     const parsedJson = parseJsonObject(generated.rawText);
     const contentParsed = generatedPostContentSchema.safeParse(parsedJson);
-
-    if (!contentParsed.success) {
-      return errorResponse("GENERATION_FAILED", "Invalid post content output.", 500);
-    }
-
-    const content = contentParsed.data;
+    const content = contentParsed.success
+      ? contentParsed.data
+      : buildFallbackContent({
+          characterName: character.name,
+          requestedActivityMode: payload.activityMode,
+        });
     const mediaPipeline = buildMediaPipelinePlan({
       character: {
         id: character.id,

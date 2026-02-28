@@ -71,6 +71,21 @@ npm run dev -- --port 3000
 - Callback route: `/auth/callback`
 - Protected routes: `/create`, `/manage`
 
+### Local dev auth bypass (optional)
+
+For local testing without OAuth, enable:
+
+```bash
+DEV_AUTH_BYPASS_ENABLED=true
+```
+
+Then open:
+- `/api/dev/auth/login-as?next=/manage` (auto-pick first profile)
+- `/api/dev/auth/login-as?userId=<profile-uuid>&next=/manage`
+
+To clear bypass cookie:
+- `/api/dev/auth/logout?next=/login`
+
 ### Redirect configuration
 
 Supabase Dashboard > Authentication > URL Configuration
@@ -86,6 +101,13 @@ Allow at least:
 - Generative API details/costs: `docs/generative-ai-apis.md`
 - Posting policy: `docs/posting-activity-policy.md`
 - Character-gen Supabase SQL guide: `docs/character-gen-supabase.sql`
+
+## LLM API UI connection
+
+- Create wizard (`/create`) now calls `POST /api/ai/character-generate` and persists generated summary/prompt metadata into character `memory`.
+- Manage detail (`/manage/[id]`) includes LLM action buttons for:
+  - `POST /api/ai/activity-manage`
+  - `POST /api/ai/post-content-generate`
 
 ## License
 

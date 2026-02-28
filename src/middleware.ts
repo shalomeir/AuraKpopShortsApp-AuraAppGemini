@@ -2,12 +2,19 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 
 const PROTECTED_PREFIXES = ['/create', '/manage'];
+const DEV_AUTH_COOKIE_NAME = 'aura_dev_user_id';
 
 function isProtectedPath(pathname: string): boolean {
   return PROTECTED_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 }
 
 export async function middleware(request: NextRequest) {
+  const isDevBypassEnabled =
+    process.env.NODE_ENV !== 'production' &&
+    (process.env.DEV_AUTH_BYPASS_ENABLED === 'true' ||
+      process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS_ENABLED === 'true');
+  const hasDevBypassUser = Boolean(request.cookies.get(DEV_AUTH_COOKIE_NAME)?.value);
+
   const hasAuthCode = request.nextUrl.searchParams.has('code');
   const hasEmailOtp =
     request.nextUrl.searchParams.has('token_hash') &&
@@ -56,7 +63,11 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (isProtectedPath(request.nextUrl.pathname) && !user) {
+  if (
+    isProtectedPath(request.nextUrl.pathname) &&
+    !user &&
+    !(isDevBypassEnabled && hasDevBypassUser)
+  ) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = '/login';
     redirectUrl.searchParams.set('next', request.nextUrl.pathname);

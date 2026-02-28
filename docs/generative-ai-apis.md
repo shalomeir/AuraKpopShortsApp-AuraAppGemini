@@ -10,8 +10,8 @@ PRD 기준으로 생성형 기능을 아래 3개 API로 분리했습니다.
 
 ## 모델 정책 (요청 반영)
 
-- 단순 텍스트/분류: `gemini-3-flash`
-- 문장 생성/복잡 추론/카피 생성: `gemini-3.1-pro`
+- 단순 텍스트/분류: `gemini-2.0-flash-001`
+- 문장 생성/복잡 추론/카피 생성: `gemini-2.0-flash-001`
 - 이미지 생성: `nano-banana-2`
 - 영상 생성: `veo-3-fast`
 - 음악/음성 생성: `lyria-3` (fallback: `lyria-2`)
@@ -19,6 +19,7 @@ PRD 기준으로 생성형 기능을 아래 3개 API로 분리했습니다.
 환경변수 오버라이드:
 - `MODEL_SIMPLE_TEXT`
 - `MODEL_REASONING`
+- `MODEL_TEXT_FALLBACK` (comma-separated)
 - `MODEL_IMAGE`
 - `MODEL_VIDEO`
 - `MODEL_AUDIO_PRIMARY`
@@ -27,7 +28,7 @@ PRD 기준으로 생성형 기능을 아래 3개 API로 분리했습니다.
 ## 1) 캐릭터 생성 API
 
 - Method/Path: `POST /api/ai/character-generate`
-- 사용 텍스트 모델: `gemini-3.1-pro`
+- 사용 텍스트 모델: `MODEL_REASONING` (fallback 지원)
 - 목적: Step 1~4 입력으로 캐릭터 아이덴티티(이름/바이오/데뷔카피/이미지·밈비디오 프롬프트) 생성
 - 저장: Supabase Storage `character-generations/{managerUserId}/{requestId}.json`
 - 메타 저장(옵션): `character_generations`
@@ -35,7 +36,7 @@ PRD 기준으로 생성형 기능을 아래 3개 API로 분리했습니다.
 ## 2) 캐릭터 활동 관리 API
 
 - Method/Path: `POST /api/ai/activity-manage`
-- 사용 텍스트 모델: `gemini-3.1-pro`
+- 사용 텍스트 모델: `MODEL_REASONING` (fallback 지원)
 - 목적: 캐릭터의 하루 활동 전략(테마, 모드, 2회차 큐) 생성 및 반영
 - 반영 내용:
   - `characters.activity_modes`, `characters.comment_tone`, `characters.memory.last_activity_plan`
@@ -45,8 +46,8 @@ PRD 기준으로 생성형 기능을 아래 3개 API로 분리했습니다.
 
 - Method/Path: `POST /api/ai/post-content-generate`
 - 사용 모델:
-  - 분류(`mediaMode=auto`): `gemini-3-flash`
-  - 카피/프롬프트 생성: `gemini-3.1-pro`
+  - 분류(`mediaMode=auto`): `MODEL_SIMPLE_TEXT` (fallback 지원)
+  - 카피/프롬프트 생성: `MODEL_REASONING` (fallback 지원)
   - 밈 루프: `nano-banana-2` GIF 루프
   - 긴 영상: `nano-banana-2` 이미지 선생성 후 `veo-3-fast` image-to-video
   - 오디오 오버레이(옵션): `lyria-3` -> 실패 시 `lyria-2`
@@ -111,7 +112,7 @@ PRD 기준으로 생성형 기능을 아래 3개 API로 분리했습니다.
 
 ### 2) 정책 모델 기준 추정 방식
 
-`gemini-3-flash`, `gemini-3.1-pro`, `nano-banana-2`, `lyria-3/2`의 최신 정식 단가는 변동 가능성이 높아,
+`gemini-2.0-flash-001`(또는 운영 중 override 모델), `nano-banana-2`, `lyria-3/2`의 최신 정식 단가는 변동 가능성이 높아,
 실제 견적은 배포 직전 Vertex 청구 콘솔 기준으로 재확인해야 합니다.
 
 실무 추정은 다음처럼 계산합니다.

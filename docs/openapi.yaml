@@ -179,7 +179,7 @@ paths:
               example:
                 characterId: e3312354-a534-4da9-89dd-64e6cc0c8ed2
                 applied: true
-                model: gemini-3.1-pro
+                model: gemini-2.0-flash-001
                 plan:
                   dailyTheme: midnight stage rookie arc
                   commentTone: chic
@@ -247,13 +247,13 @@ paths:
                 characterId: e3312354-a534-4da9-89dd-64e6cc0c8ed2
                 draftPostId: c9efb0de-44ff-4fbe-a8a3-8de9de4a3ac5
                 model:
-                  classification: gemini-3-flash
-                  reasoning: gemini-3.1-pro
+                  classification: gemini-2.0-flash-001
+                  reasoning: gemini-2.0-flash-001
                 mediaMode: meme_gif_loop
                 mediaPipeline:
                   mediaMode: meme_gif_loop
                   estimatedPrimaryModels:
-                    textReasoning: gemini-3.1-pro
+                    textReasoning: gemini-2.0-flash-001
                     image: nano-banana-2
                 content:
                   contentType: video_loop

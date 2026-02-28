@@ -8,13 +8,13 @@
 - [x] Supabase 프로필 자동 생성/보정 로직 추가 (FK 제약으로 인한 데이터 생성 실패 방지)
 - [x] 통합 환경 연동 완료 (Vercel 배포 준비, Supabase 원격 연결, GCP Vertex & Gemini 2.x Flash 설정 및 ADC 인증)
 - [x] Auth (Google OAuth only)
-- [ ] 캐릭터 생성 API + UI (4단계 위저드)
+- [x] 캐릭터 생성 API + UI (4단계 위저드)
 - [ ] 배치 큐 등록 로직
 - [x] 서버 API 1차 구현 (feed, characters, ranking, follow, like)
 
 ## P1 (Week 1~2) — 핵심 기능
 
-- [ ] LLM 카피 생성 연동 (Vercel AI SDK)
+- [x] LLM 카피 생성 연동 (Vercel AI SDK)
 - [x] Character Gen API 신설 (Next.js Route Handler + Vertex AI + Supabase Storage)
 - [x] Activity Manage API 신설 (생성형 계획 + batch_queue 반영)
 - [x] Post Content Generate API 신설 (캡션/프롬프트 생성 + draft 저장)
