@@ -103,6 +103,241 @@ paths:
                 error:
                   code: UNAUTHORIZED
                   message: Authentication required.
+  /api/ai/character-generate:
+    post:
+      summary: Vertex AI 기반 캐릭터 생성
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              profile:
+                gender: female
+                ageRange: twenties
+                nationality: Korea
+                faceShape: v-line
+                hairColor: ash-gray
+                fashionMood: trendy
+                concept: chic
+              idol:
+                positions: [main_vocal, leader]
+                signatureMood: mysterious
+                persona: artist
+              activityModes: [performance, meme]
+              commentTone: chic
+              language: ko
+              characterNameHint: Aura Rina
+      responses:
+        "201":
+          description: 생성/저장 성공
+          content:
+            application/json:
+              example:
+                requestId: c1f76109-2d7f-440f-bca6-2233783bc511
+                storageBucket: character-generations
+                storagePath: 7b099ec8-17a8-41f7-b9b0-63ec7f3f8bf5/c1f76109-2d7f-440f-bca6-2233783bc511.json
+                character:
+                  name: 오라 리나
+                  shortBio: 네온 무대 위 시크한 메인보컬 리더
+                  debutCopy: 오늘 밤, 내 심장 박자로 무대가 시작돼.
+                  visualPrompt: kpop virtual idol portrait, hologram stage lights, cinematic close-up
+                  memeVideoPrompt: vertical 9:16, 3-second loop, playful wink and beat drop reaction
+                  tags: [kpop, virtualidol, neon]
+        "400":
+          description: 입력 검증 실패
+          content:
+            application/json:
+              example:
+                error:
+                  code: VALIDATION_ERROR
+                  message: Request body is invalid.
+        "500":
+          description: 생성 실패
+          content:
+            application/json:
+              example:
+                error:
+                  code: GENERATION_FAILED
+                  message: Vertex response has no text candidate
+  /api/ai/activity-manage:
+    post:
+      summary: 캐릭터 활동 계획 생성/반영
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              characterId: e3312354-a534-4da9-89dd-64e6cc0c8ed2
+              targetDate: "2026-03-01"
+              applyChanges: true
+              syncBatchQueue: true
+      responses:
+        "200":
+          description: 생성 성공
+          content:
+            application/json:
+              example:
+                characterId: e3312354-a534-4da9-89dd-64e6cc0c8ed2
+                applied: true
+                model: gemini-3.1-pro
+                plan:
+                  dailyTheme: midnight stage rookie arc
+                  commentTone: chic
+                  activityModes: [performance, meme, fan]
+                  queue:
+                    - sequence: 1
+                      activityMode: performance
+                      contentType: image
+                      captionDirection: debut mood teaser
+                    - sequence: 2
+                      activityMode: meme
+                      contentType: video_loop
+                      captionDirection: reaction challenge
+        "400":
+          description: 입력 검증 실패
+          content:
+            application/json:
+              example:
+                error:
+                  code: VALIDATION_ERROR
+                  message: Request body is invalid.
+        "401":
+          description: 인증 필요
+          content:
+            application/json:
+              example:
+                error:
+                  code: UNAUTHORIZED
+                  message: Authentication required.
+        "404":
+          description: 캐릭터 없음
+          content:
+            application/json:
+              example:
+                error:
+                  code: NOT_FOUND
+                  message: Character not found.
+        "500":
+          description: 생성/DB 반영 실패
+          content:
+            application/json:
+              example:
+                error:
+                  code: GENERATION_FAILED
+                  message: Invalid activity plan output.
+  /api/ai/post-content-generate:
+    post:
+      summary: 최종 포스팅 콘텐츠 생성/드래프트 저장
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              characterId: e3312354-a534-4da9-89dd-64e6cc0c8ed2
+              sequence: 2
+              activityMode: meme
+              mediaMode: auto
+              persistDraft: true
+      responses:
+        "201":
+          description: 생성 성공
+          content:
+            application/json:
+              example:
+                characterId: e3312354-a534-4da9-89dd-64e6cc0c8ed2
+                draftPostId: c9efb0de-44ff-4fbe-a8a3-8de9de4a3ac5
+                model:
+                  classification: gemini-3-flash
+                  reasoning: gemini-3.1-pro
+                mediaMode: meme_gif_loop
+                mediaPipeline:
+                  mediaMode: meme_gif_loop
+                  estimatedPrimaryModels:
+                    textReasoning: gemini-3.1-pro
+                    image: nano-banana-2
+                content:
+                  contentType: video_loop
+                  activityMode: meme
+                  caption: 리듬이 들어오면 표정부터 달라져.
+                  overlayText: 오늘의 3초 밈 챌린지
+                  hashtags: [kpop, idolmeme, auraverse]
+                  imagePrompt: cyber neon stage portrait, 9:16, cinematic
+                  videoPrompt: 3-second vertical dance reaction loop, punchy beat
+                  safetyNotes: [no real-person likeness, no trademark logos]
+        "400":
+          description: 입력 검증 실패
+          content:
+            application/json:
+              example:
+                error:
+                  code: VALIDATION_ERROR
+                  message: Request body is invalid.
+        "401":
+          description: 인증 필요
+          content:
+            application/json:
+              example:
+                error:
+                  code: UNAUTHORIZED
+                  message: Authentication required.
+        "404":
+          description: 캐릭터 없음
+          content:
+            application/json:
+              example:
+                error:
+                  code: NOT_FOUND
+                  message: Character not found.
+        "403":
+          description: 포스팅 중단 상태
+          content:
+            application/json:
+              example:
+                error:
+                  code: POSTING_PAUSED
+                  message: Posting is paused because manager was inactive yesterday.
+        "500":
+          description: 생성/저장 실패
+          content:
+            application/json:
+              example:
+                error:
+                  code: DB_ERROR
+                  message: insert or update on table \"posts\" violates foreign key constraint
+  /api/internal/automation/daily-posting:
+    post:
+      summary: 전날 활동 기준 자동 포스팅 큐 스케줄링 (내부용)
+      parameters:
+        - in: header
+          name: x-automation-secret
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 처리 성공
+          content:
+            application/json:
+              example:
+                queued: 42
+                activeOwners: 17
+                pausedOwners: 5
+        "401":
+          description: 내부 인증 실패
+          content:
+            application/json:
+              example:
+                error:
+                  code: UNAUTHORIZED
+                  message: Invalid automation secret.
+        "500":
+          description: DB 처리 실패
+          content:
+            application/json:
+              example:
+                error:
+                  code: DB_ERROR
+                  message: Failed to read profiles.
   /api/characters/{id}:
     get:
       summary: 캐릭터 상세 조회

@@ -14,6 +14,14 @@
 ## P1 (Week 1~2) — 핵심 기능
 
 - [ ] LLM 카피 생성 연동 (Vercel AI SDK)
+- [x] Character Gen API 신설 (Next.js Route Handler + Vertex AI + Supabase Storage)
+- [x] Activity Manage API 신설 (생성형 계획 + batch_queue 반영)
+- [x] Post Content Generate API 신설 (캡션/프롬프트 생성 + draft 저장)
+- [x] 생성형 API 문서 및 호출당 비용 추정 문서화
+- [x] API별 모델 정책 반영 (gemini-3-flash / gemini-3.1-pro / nano-banana-2 / veo-3-fast / lyria-3,2)
+- [x] 밈 루프 GIF/긴 영상 image-to-video 파이프라인 정책 반영
+- [x] 자동 포스팅 정책 반영 (첫날 3개, 이후 일일 2개)
+- [x] 전날 미접속 유저 캐릭터 포스팅 자동 중단 정책 구현
 - [ ] GCP Imagen 이미지 생성 연동
 - [ ] 배치 Edge Function + pg_cron 설정
 - [ ] 메인 피드 UI (3탭 + 폴링)

@@ -12,8 +12,17 @@ export async function GET(request: NextRequest) {
   if (code) {
     const supabase = createSupabaseServerClient();
     await supabase.auth.exchangeCodeForSession(code);
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (user) {
+      await supabase
+        .from("profiles")
+        .update({ last_seen_at: new Date().toISOString() })
+        .eq("id", user.id);
+    }
   }
 
   return NextResponse.redirect(new URL(next, request.url));
 }
-

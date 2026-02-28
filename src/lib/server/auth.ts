@@ -22,6 +22,11 @@ export async function getAuthenticatedUser(): Promise<
     return errorResponse("UNAUTHORIZED", "Authentication required.", 401);
   }
 
+  // 사용자 활동 여부 기반 자동 포스팅 정책을 위해 마지막 접속 시간을 갱신한다.
+  await supabase
+    .from("profiles")
+    .update({ last_seen_at: new Date().toISOString() })
+    .eq("id", user.id);
+
   return { userId: user.id, supabase };
 }
-

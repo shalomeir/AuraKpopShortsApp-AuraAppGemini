@@ -34,6 +34,34 @@
    - `supabase/migrations/20260228162000_init_aura.sql` 추가
    - OpenAPI 문서 `docs/openapi.yaml` 추가
    - `README.md`, `.env.example`, `vercel.json` 업데이트
+9. **생성형 API 3종 신설 (2026-02-28)**:
+   - worktree 브랜치 `feature/vertex-character-gen-api`에서 분리 개발
+   - Fastify 분리 서비스 대신 **Next.js Route Handler**로 통합
+   - `POST /api/ai/character-generate`: PRD Step1~4 입력 기반 Vertex Gemini 캐릭터 생성
+   - `POST /api/ai/activity-manage`: 캐릭터 활동 계획 생성 + `characters`/`batch_queue` 반영
+   - `POST /api/ai/post-content-generate`: 최종 포스팅 캡션/프롬프트 생성 + `posts` draft 저장
+   - 모델 정책 적용:
+     - 단순 분류 `gemini-3-flash`
+     - 추론/카피 `gemini-3.1-pro`
+     - 이미지 `nano-banana-2`
+     - 영상 `veo-3-fast`
+     - 음악/음성 `lyria-3`(fallback `lyria-2`)
+   - 미디어 파이프라인 정책:
+     - 밈 루프는 `nano-banana-2` GIF 루프
+     - 긴 영상은 `nano-banana-2` 이미지 생성 후 `veo-3-fast` image-to-video
+   - 모든 미디어 계획에 face/persona consistency lock 포함
+   - 생성 결과를 Supabase Storage(`character-generations`)에 JSON 업로드
+   - 메타데이터 테이블(`character_generations`) 기록 옵션 지원
+   - OpenAPI/README/환경변수/SQL 가이드(`docs/character-gen-supabase.sql`) 반영
+   - 별도 문서 `docs/generative-ai-apis.md`에 API 설명 및 호출당 비용 추정 정리
+10. **자동 포스팅 정책 구현 (2026-02-28)**:
+   - 캐릭터 생성 직후: 즉시 2개 + 1시간 뒤 1개(첫날 총 3개)
+   - 다음날부터: 캐릭터당 매일 2개 큐 생성
+   - 전날 미접속 유저의 모든 캐릭터 자동 포스팅 중단(`is_active=false`)
+   - 중단 캐릭터는 `POST /api/ai/post-content-generate`에서 `POSTING_PAUSED` 차단
+   - 내부 자동화 API `POST /api/internal/automation/daily-posting` 추가
+   - 접속 추적 컬럼 `profiles.last_seen_at` 및 인덱스 마이그레이션 추가
+   - 정책 문서 `docs/posting-activity-policy.md` 추가
 
 ### 다음 단계 진행을 위한 Todo 연동
 
@@ -41,7 +69,9 @@
 현재 가장 우선순위가 높은 P0 작업들은 모두 끝났으며, MVP 주요 핵심 기능인 아래 내용을 진행해야 합니다.
 
 - **Auth 마무리**: 이메일 로그인/회원가입, 보호 라우트 미들웨어
-- **캐릭터 생성 UI**: 4단계 위저드와 `/api/characters` 연동
+- **캐릭터 생성 UI**: 4단계 위저드와 `/api/ai/character-generate` 연동
+- **활동/콘텐츠 운영 UI**: `/api/ai/activity-manage`, `/api/ai/post-content-generate` 연동
+- **운영 자동화 연결**: `daily-posting` 내부 API를 Vercel Cron으로 1일 1회 호출
 - **피드 데이터 소스 전환**: mockData -> `/api/feed` 실제 API 연동
 
 ### 에이전트 인계 지침
