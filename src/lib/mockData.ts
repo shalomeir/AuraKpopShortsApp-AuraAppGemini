@@ -37,13 +37,40 @@ async function getMockVideoUrl(index: number): Promise<string> {
   return fallbacks[index % fallbacks.length];
 }
 
+// 0.5. Unsplash API 헬퍼
+async function getMockImageUrl(index: number, type: 'avatar' | 'post'): Promise<string> {
+  const unsplashKey = process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY || process.env.UNSPLASH_ACCESS_KEY;
+  if (unsplashKey) {
+    try {
+      const query = type === 'avatar' ? 'korean,portrait' : 'kpop,idol';
+      const res = await fetch(
+        `https://api.unsplash.com/search/photos?query=${query}&per_page=20`,
+        { headers: { Authorization: `Client-ID ${unsplashKey}` } }
+      );
+      const data = await res.json();
+      if (data.results && data.results.length > 0) {
+        const photo = data.results[index % data.results.length];
+        return type === 'avatar' ? photo.urls.small : photo.urls.regular;
+      }
+    } catch (e) {
+      console.error('Unsplash API error:', e);
+    }
+  }
+  
+  // Fallback (API 키 없을 때 source.unsplash.com 사용)
+  const size = type === 'avatar' ? '200x200' : '400x600';
+  const queryFallback = type === 'avatar' ? 'korean,portrait' : 'kpop,idol';
+  return `https://source.unsplash.com/${size}/?${queryFallback},${index}`;
+}
+
 // 1. 캐릭터 목록 Mock (DummyJSON Users 활용)
 export async function getMockCharacters(limit = 10, skip = 0): Promise<Character[]> {
   try {
     const res = await fetch(`${DUMMY_JSON_URL}/users?limit=${limit}&skip=${skip}`);
     const data = await res.json();
     
-    return data.users.map((user: Record<string, unknown>) => {
+    // 순차적으로 API 호출 방지 (병렬 혹은 먼저 생성된 URL 연동)
+    const characters = await Promise.all(data.users.map(async (user: Record<string, unknown>) => {
       // DummyJSON의 User 데이터를 Aura의 Character 도메인 스키마에 맞게 맵핑
       const gender = user.gender === 'male' ? 'male' : 'female';
       const age = Number(user.age) || 20;
@@ -57,6 +84,8 @@ export async function getMockCharacters(limit = 10, skip = 0): Promise<Character
       const idNum = Number(user.id) || 0;
       const firstName = String(user.firstName || '');
       const lastName = String(user.lastName || '');
+
+      const avatarUrl = await getMockImageUrl(idNum, 'avatar');
 
       return {
         id: `char_${idStr}`,
@@ -83,12 +112,13 @@ export async function getMockCharacters(limit = 10, skip = 0): Promise<Character
         fan_level: age * 2,
         follower_count: Math.floor(Math.random() * 50000),
         is_active: true,
-        // Unsplash API를 사용하여 KPOP 아이돌 초상화 스타일 랜덤 이미지 적용
-        avatar_url: `https://source.unsplash.com/200x200/?korean,portrait,${idStr}`,
+        // Unsplash API를 사용하여 KPOP 아이돌 초상화 스타일 적용
+        avatar_url: avatarUrl,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
-    });
+    }));
+    return characters;
   } catch (error) {
     console.error('Failed to fetch mock characters:', error);
     return [];
@@ -111,7 +141,8 @@ export async function getMockPosts(limit = 10, skip = 0): Promise<Post[]> {
       const tags = (post.tags as string[]) || [];
 
       const isVideo = idNum % 3 === 0;
-      let mediaUrl = `https://source.unsplash.com/400x600/?kpop,idol,${idStr}`;
+      let mediaUrl = await getMockImageUrl(index, 'post');
+      const mediaThumbUrl = `https://source.unsplash.com/200x300/?kpop,idol,${idStr}`;
       
       if (isVideo) {
          mediaUrl = await getMockVideoUrl(index);
@@ -124,7 +155,7 @@ export async function getMockPosts(limit = 10, skip = 0): Promise<Post[]> {
         caption: String(post.body || '').slice(0, 100) + '... #' + (tags[0] || 'KPOP'), 
         // 9:16 비율 (세로 숏폼 포맷 모방)을 위해 Unsplash (또는 Pexels) 사용
         media_url: mediaUrl,
-        media_thumb_url: `https://source.unsplash.com/200x300/?kpop,idol,${idStr}`,
+        media_thumb_url: mediaThumbUrl,
         activity_mode,
         batch_sequence: (index % 4) + 1,
         generation_meta: { source: isVideo ? 'pexels_mock' : 'unsplash_mock' },
