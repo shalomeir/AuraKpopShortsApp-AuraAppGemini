@@ -1,13 +1,20 @@
 import { createBrowserClient } from "@supabase/ssr";
-import { requireEnv } from "@/lib/env";
 
 /**
  * Supabase client for browser components.
  */
 export function createSupabaseBrowserClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error(
+      "Missing required NEXT_PUBLIC Supabase environment variables.",
+    );
+  }
+
   return createBrowserClient(
-    requireEnv("NEXT_PUBLIC_SUPABASE_URL"),
-    requireEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
+    supabaseUrl,
+    supabaseAnonKey,
   );
 }
-

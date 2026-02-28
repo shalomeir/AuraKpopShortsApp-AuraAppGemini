@@ -2,11 +2,12 @@
 
 ## P0 (Week 1) — 작동하는 뼈대
 
-- [x] Mockup Data 생성 (DummyJSON 활용한 개발용 뼈대)
+- [x] Mockup Data 생성 (초기 개발용)
 - [x] Next.js 프로젝트 초기화 (shadcn/ui 세팅)
 - [x] Supabase 프로젝트 셋업 + DB 마이그레이션
+- [x] Supabase 프로필 자동 생성/보정 로직 추가 (FK 제약으로 인한 데이터 생성 실패 방지)
 - [x] 통합 환경 연동 완료 (Vercel 배포 준비, Supabase 원격 연결, GCP Vertex & Gemini 2.x Flash 설정 및 ADC 인증)
-- [ ] Auth (Google OAuth + 이메일)
+- [x] Auth (Google OAuth only)
 - [ ] 캐릭터 생성 API + UI (4단계 위저드)
 - [ ] 배치 큐 등록 로직
 - [x] 서버 API 1차 구현 (feed, characters, ranking, follow, like)
@@ -17,6 +18,10 @@
 - [ ] GCP Imagen 이미지 생성 연동
 - [ ] 배치 Edge Function + pg_cron 설정
 - [ ] 메인 피드 UI (3탭 + 폴링)
+  - [x] 3탭(`/api/feed`: recommended/following/mine) 연동 및 인증 에러(401) 처리
+- [x] 주요 화면 mock 데이터 제거 및 Supabase 조회 전환 (홈/캐릭터/랭킹/관리)
+- [x] `src/lib/mockData.ts` 제거 (Supabase + API 기반으로 단일화)
+- [x] 개발용 Supabase seed SQL 추가 (빈 DB에서도 피드/랭킹 확인 가능)
 - [ ] 팔로우 / 좋아요 API
 
 ## P2 (Week 2) — 마무리

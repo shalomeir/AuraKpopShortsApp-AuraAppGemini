@@ -16,17 +16,53 @@ export default function CreateCharacterPage() {
     name: ''
   });
   const [isGenerating, setIsGenerating] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleNext = () => {
     if (step < 4) setStep(step + 1);
     else handleCreate();
   };
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
+    if (!formData.name.trim()) return;
+
     setIsGenerating(true);
-    setTimeout(() => {
-      router.push('/character/char_1'); // Redirect to a mock profile
-    }, 2000);
+    setErrorMessage(null);
+
+    try {
+      const response = await fetch("/api/characters", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name.trim(),
+          gender: formData.gender,
+          concept: formData.concept,
+          position: [formData.position],
+          persona: formData.persona,
+          activityModes: ["performance", "daily", "meme", "fan"],
+        }),
+      });
+
+      const body = (await response.json()) as {
+        character?: { id: string };
+        message?: string;
+      };
+
+      if (!response.ok || !body.character?.id) {
+        setErrorMessage(
+          body.message ?? "Character creation failed. Please check your login state.",
+        );
+        return;
+      }
+
+      router.push(`/character/${body.character.id}`);
+    } catch {
+      setErrorMessage("A network error occurred.");
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -156,6 +192,9 @@ export default function CreateCharacterPage() {
       </div>
 
       <div className="p-4 mt-auto">
+        {errorMessage ? (
+          <p className="text-sm text-red-400 mb-3">{errorMessage}</p>
+        ) : null}
         <button 
           onClick={handleNext}
           disabled={isGenerating || (step === 4 && !formData.name)}
@@ -173,4 +212,3 @@ export default function CreateCharacterPage() {
     </main>
   );
 }
-

@@ -1,10 +1,26 @@
-import { getMockRanking } from "@/lib/mockData";
 import Image from "next/image";
 import Link from "next/link";
 import { Trophy, ArrowUp, Zap } from "lucide-react";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+
+interface LeaderboardCharacter {
+  id: string;
+  name: string;
+  avatar_url: string | null;
+  follower_count: number;
+  fan_level: number;
+}
 
 export default async function LeaderboardPage() {
-  const rankings = await getMockRanking(10);
+  const supabase = createSupabaseServerClient();
+  const { data } = await supabase
+    .from("characters")
+    .select("id, name, avatar_url, follower_count, fan_level")
+    .order("follower_count", { ascending: false })
+    .order("fan_level", { ascending: false })
+    .limit(10);
+
+  const rankings = (data ?? []) as LeaderboardCharacter[];
   
   return (
     <main className="flex flex-col w-full min-h-[calc(100vh-64px)] bg-aura-surface pb-8">
@@ -30,7 +46,7 @@ export default async function LeaderboardPage() {
                 </span>
               </div>
               <div className="relative w-12 h-12 rounded-full overflow-hidden shrink-0 border border-aura-outline group-hover:border-aura-secondary transition-colors">
-                <Image src={char.avatar_url || "/default-avatar.png"} alt={char.name} fill className="object-cover" />
+                <Image src={char.avatar_url || "/default-avatar.svg"} alt={char.name} fill className="object-cover" />
               </div>
               <div className="flex-1 ml-4 flex flex-col justify-center">
                 <h3 className="font-bold text-base text-white group-hover:text-aura-secondary transition-colors leading-tight">{char.name}</h3>

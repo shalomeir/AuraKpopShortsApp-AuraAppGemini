@@ -1,24 +1,58 @@
-import { getMockCharacters, getMockPosts } from "@/lib/mockData";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, Grid, Sparkles, MoreHorizontal } from "lucide-react";
+import { notFound } from "next/navigation";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+
+interface CharacterProfile {
+  id: string;
+  name: string;
+  concept: string | null;
+  position: string[] | null;
+  follower_count: number;
+  fan_level: number;
+  avatar_url: string | null;
+  memory: {
+    debut_story: string | null;
+  } | null;
+}
+
+interface CharacterPost {
+  id: string;
+  media_url: string | null;
+  media_thumb_url: string | null;
+  content_type: string;
+}
 
 export default async function CharacterProfilePage({ params }: { params: { id: string } }) {
-  const chars = await getMockCharacters(20, 0);
-  const char = chars.find(c => c.id === params.id) || chars[0]; // fallback
-  
-  // mock their posts by filtering
-  const allPosts = await getMockPosts(30, 0);
-  const charPosts = allPosts.filter(p => p.character_id === char.id).slice(0, 9);
-  
-  // if no posts, just reuse allPosts to mock heavily
-  const postsToShow = charPosts.length > 0 ? charPosts : allPosts.slice(0, 9);
+  const supabase = createSupabaseServerClient();
+  const { data: charData } = await supabase
+    .from("characters")
+    .select("id, name, concept, position, follower_count, fan_level, avatar_url, memory")
+    .eq("id", params.id)
+    .single();
+
+  if (!charData) {
+    notFound();
+  }
+
+  const char = charData as CharacterProfile;
+
+  const { data: postData } = await supabase
+    .from("posts")
+    .select("id, media_url, media_thumb_url, content_type")
+    .eq("character_id", params.id)
+    .eq("status", "published")
+    .order("created_at", { ascending: false })
+    .limit(9);
+
+  const postsToShow = (postData ?? []) as CharacterPost[];
 
   return (
     <main className="flex flex-col w-full min-h-[calc(100vh-64px)] bg-aura-surface pb-8">
       {/* Top Banner & Header (240dp height) */}
       <div className="relative h-[240px] w-full shrink-0 bg-aura-surfaceContainer">
-        <Image src={char.avatar_url || "/default-avatar.png"} alt="Cover" fill className="object-cover opacity-60" priority />
+        <Image src={char.avatar_url || "/default-avatar.svg"} alt="Cover" fill className="object-cover opacity-60" priority />
         <div className="absolute inset-0 bg-gradient-to-b from-[#0B0F14]/60 to-[#0B0F14] opacity-100" />
         
         <div className="absolute top-0 w-full p-4 pt-[16px] flex justify-between items-center z-10">
@@ -35,14 +69,14 @@ export default async function CharacterProfilePage({ params }: { params: { id: s
         {/* Profile Info Overlay */}
         <div className="absolute bottom-0 left-0 w-full px-4 pb-4 flex items-end gap-4">
           <div className="relative w-[88px] h-[88px] rounded-full overflow-hidden shrink-0 border-[2px] border-aura-surface bg-aura-surfaceVariant elevation-2">
-            <Image src={char.avatar_url || "/default-avatar.png"} alt={char.name} fill className="object-cover" />
+            <Image src={char.avatar_url || "/default-avatar.svg"} alt={char.name} fill className="object-cover" />
           </div>
           <div className="flex-1 pb-1">
             <h1 className="text-xl font-bold text-white flex items-center gap-2 drop-shadow-md">
               {char.name}
               <Sparkles size={16} className="text-aura-tertiary" />
             </h1>
-            <p className="text-zinc-400 text-sm mt-1">{char.concept} · {char.position.join(", ")}</p>
+            <p className="text-zinc-400 text-sm mt-1">{char.concept ?? "concept"} · {(char.position ?? []).join(", ")}</p>
           </div>
         </div>
       </div>
@@ -59,7 +93,7 @@ export default async function CharacterProfilePage({ params }: { params: { id: s
             <span className="text-xs text-zinc-400 mt-1">Fan Level</span>
           </div>
           <div className="flex flex-col items-center">
-            <span className="text-base font-bold text-white">{postsToShow.length+12}</span>
+            <span className="text-base font-bold text-white">{postsToShow.length}</span>
             <span className="text-xs text-zinc-400 mt-1">Posts</span>
           </div>
         </div>
@@ -72,7 +106,7 @@ export default async function CharacterProfilePage({ params }: { params: { id: s
         
         <p className="mt-4 text-[14px] text-zinc-300 leading-relaxed px-1">
           <span className="font-semibold text-aura-tertiary block mb-1 text-[12px]">ABOUT</span>
-          &quot;{char.memory.debut_story || 'Working hard to debut and meet you all soon!'}&quot;
+          &quot;{char.memory?.debut_story || "Working hard to debut and meet you all soon!"}&quot;
         </p>
       </div>
 
@@ -84,7 +118,7 @@ export default async function CharacterProfilePage({ params }: { params: { id: s
         <div className="grid grid-cols-3 gap-1">
           {postsToShow.map((post) => (
             <div key={post.id} className="relative aspect-[3/4] bg-aura-surfaceVariant overflow-hidden cursor-pointer group">
-              <Image src={post.media_thumb_url || post.media_url || "/default-avatar.png"} alt="post" fill className="object-cover" />
+              <Image src={post.media_thumb_url || post.media_url || "/default-avatar.svg"} alt="post" fill className="object-cover" />
               {post.content_type === "moving_poster" && (
                 <div className="absolute top-1 right-1 bg-black/50 px-1 py-0.5 rounded backdrop-blur-sm">
                   <span className="text-[9px] font-bold text-white tracking-wider">FILM</span>

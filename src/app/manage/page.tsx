@@ -1,10 +1,32 @@
-import { getMockCharacters } from "@/lib/mockData";
 import Link from "next/link";
 import Image from "next/image";
 import { Settings2, Zap, ArrowUp } from "lucide-react";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+
+interface ManagedCharacter {
+  id: string;
+  name: string;
+  avatar_url: string | null;
+  follower_count: number;
+  fan_level: number;
+}
 
 export default async function ManagePage() {
-  const chars = await getMockCharacters(5, 0); // Mock 5 characters for management list
+  const supabase = createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let chars: ManagedCharacter[] = [];
+  if (user) {
+    const { data } = await supabase
+      .from("characters")
+      .select("id, name, avatar_url, follower_count, fan_level")
+      .eq("owner_id", user.id)
+      .order("created_at", { ascending: false });
+
+    chars = (data ?? []) as ManagedCharacter[];
+  }
 
   return (
     <main className="flex flex-col w-full min-h-[calc(100vh-64px)] bg-aura-surface pb-8">
@@ -36,7 +58,7 @@ export default async function ManagePage() {
              <Link href={`/manage/${char.id}`} key={char.id}>
               <div className="bg-aura-surfaceVariant border border-aura-outline rounded-[16px] p-4 flex gap-4 items-center hover:bg-aura-surfaceContainer transition-colors group">
                 <div className="relative w-16 h-16 rounded-full overflow-hidden shrink-0 border border-aura-outline">
-                  <Image src={char.avatar_url || "/default-avatar.png"} alt={char.name} fill className="object-cover" />
+                  <Image src={char.avatar_url || "/default-avatar.svg"} alt={char.name} fill className="object-cover" />
                 </div>
                 
                 <div className="flex-1 flex flex-col justify-center">
